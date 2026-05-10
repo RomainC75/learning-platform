@@ -1,11 +1,9 @@
-package unit_test
+package schedule_unit
 
 import (
 	"context"
 	dtos "language-learning/internal/api/dtos/request"
-	schedule_application "language-learning/internal/modules/schedule/application"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
-	schedule_infra "language-learning/internal/modules/schedule/infra"
 	utils_time "language-learning/utils/time"
 	"testing"
 	"time"
@@ -16,8 +14,7 @@ import (
 
 type CreateReservationCases struct {
 	CreateReservationRequest dtos.CreateReservationRequest
-	Student                  *schedule_domain.Student
-	Professor                *schedule_domain.Professor
+	ProfessorReservations    []schedule_domain.Reservation
 	ExpectedResponse         string
 }
 
@@ -28,32 +25,19 @@ var testCases []CreateReservationCases = []CreateReservationCases{
 			Date:        time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC),
 			Duration:    utils_time.MustParseDuration("1h"),
 		},
-		Student: schedule_domain.NewStudent(
-			uuid.New(),
-			"bob",
-			"sponge",
-			[]schedule_domain.Reservation{},
-		),
-		Professor: schedule_domain.NewProfessor(
-			uuid.UUID{},
-			"big",
-			"brother",
-			[]schedule_domain.Reservation{
-				schedule_domain.NewReservation(
-					time.Date(2026, time.May, 9, 11, 0, 0, 0, time.UTC),
-					utils_time.MustParseDuration("1h"),
-				),
-			},
-		),
+		ProfessorReservations: []schedule_domain.Reservation{
+			schedule_domain.NewReservation(
+				time.Date(2026, time.May, 9, 11, 0, 0, 0, time.UTC),
+				utils_time.MustParseDuration("1h"),
+			),
+		},
 		ExpectedResponse: "scheduled",
 	},
 }
 
 func TestCreateReservation(t *testing.T) {
 	for _, cs := range testCases {
-		professors := schedule_infra.NewInMemProfRepo(cs.Professor, false)
-		students := schedule_infra.NewInMemStudentRepo(cs.Student, false)
-		srv := schedule_application.NewReservationSrv(professors, students)
+		srv := NewTestDriver().CreateReservationsForProfessor(cs.ProfessorReservations).NewScheduleService()
 
 		ctx := context.Background()
 		res, err := srv.CreateReservation(ctx, cs.CreateReservationRequest)

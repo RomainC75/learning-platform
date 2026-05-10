@@ -24,11 +24,19 @@ func NewProfessor(id uuid.UUID, firstName string, lastName string, reservation [
 	}
 }
 
-func (professor *Professor) Schedule(newReservation *Reservation) error {
+func (professor *Professor) Schedule(newReservation Reservation) error {
 	isSchedulable := newReservation.IsReservableIn(professor.reservations)
 	if !isSchedulable {
 		return errors.New(ErrProfessorNotSchedulable)
 	}
-	professor.reservations = append(professor.reservations, *newReservation)
+	professor.reservations = append(professor.reservations, newReservation)
 	return nil
+}
+
+func (professor *Professor) MustAddSchedule(newReza Reservation) {
+	professor.reservations = append(professor.reservations, newReza)
+}
+
+func (professor *Professor) ResetSchedule() {
+	professor.reservations = []Reservation{}
 }

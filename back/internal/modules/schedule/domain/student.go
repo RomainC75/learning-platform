@@ -17,3 +17,11 @@ func NewStudent(id uuid.UUID, firstName string, lastName string, reservation []R
 		reservations: reservation,
 	}
 }
+
+func (student *Student) MustAddSchedule(newReza Reservation) {
+	student.reservations = append(student.reservations, newReza)
+}
+
+func (student *Student) ResetSchedule() {
+	student.reservations = []Reservation{}
+}

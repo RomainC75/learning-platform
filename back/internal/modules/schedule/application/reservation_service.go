@@ -25,7 +25,7 @@ func (reservationSrv *ReservationSrv) CreateReservation(ctx context.Context, cre
 	}
 
 	newReservation := schedule_domain.NewReservation(createReservationRequest.Date, createReservationRequest.Duration)
-	err = foundProfessor.Schedule(&newReservation)
+	err = foundProfessor.Schedule(newReservation)
 
 	if err != nil {
 		return "", err
