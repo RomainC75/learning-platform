@@ -2,17 +2,21 @@ package schedule_domain
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Reservation struct {
 	date     time.Time
 	duration time.Duration
+	with     uuid.UUID
 }
 
-func NewReservation(date time.Time, duration time.Duration) Reservation {
+func NewReservation(date time.Time, duration time.Duration, with uuid.UUID) Reservation {
 	return Reservation{
 		date:     date,
 		duration: duration,
+		with:     with,
 	}
 }
 

@@ -3,12 +3,24 @@ package schedule_application
 import (
 	"context"
 	dtos "language-learning/internal/api/dtos/request"
+	auth_jwt "language-learning/internal/auth/jwt"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type ReservationSrv struct {
 	professors schedule_domain.Professors
 	students   schedule_domain.Students
+}
+
+type CreateReservationResponse struct {
+	Status      bool          `json:"status"`
+	StudentId   uuid.UUID     `json:"student_id"`
+	ProfessorId uuid.UUID     `json:"professor_id"`
+	Date        time.Time     `json:"date"`
+	Duration    time.Duration `json:"duration"`
 }
 
 func NewReservationSrv(professors schedule_domain.Professors, students schedule_domain.Students) *ReservationSrv {
@@ -18,19 +30,27 @@ func NewReservationSrv(professors schedule_domain.Professors, students schedule_
 	}
 }
 
-func (reservationSrv *ReservationSrv) CreateReservation(ctx context.Context, createReservationRequest dtos.CreateReservationRequest) (string, error) {
+func (reservationSrv *ReservationSrv) CreateReservation(ctx context.Context, createReservationRequest dtos.CreateReservationRequest) (CreateReservationResponse, error) {
 	foundProfessor, err := reservationSrv.professors.Get(createReservationRequest.ProfessorId)
 	if err != nil {
-		return "", err
+		return CreateReservationResponse{}, err
 	}
 
-	newReservation := schedule_domain.NewReservation(createReservationRequest.Date, createReservationRequest.Duration)
+	studentId, _ := ctx.Value(auth_jwt.UserId).(uuid.UUID)
+
+	newReservation := schedule_domain.NewReservation(createReservationRequest.Date, createReservationRequest.Duration, studentId)
 	err = foundProfessor.Schedule(newReservation)
 
-	if err != nil {
-		return "", err
+	var status bool
+	if err == nil {
+		status = true
 	}
 
-	// fmt.Fprintf("stu", )
-	return "scheduled", nil
+	return CreateReservationResponse{
+		Status:      status,
+		StudentId:   studentId,
+		ProfessorId: foundProfessor.Id(),
+		Date:        createReservationRequest.Date,
+		Duration:    createReservationRequest.Duration,
+	}, nil
 }

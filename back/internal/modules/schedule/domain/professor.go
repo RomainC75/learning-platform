@@ -40,3 +40,7 @@ func (professor *Professor) MustAddSchedule(newReza Reservation) {
 func (professor *Professor) ResetSchedule() {
 	professor.reservations = []Reservation{}
 }
+
+func (professor *Professor) Id() uuid.UUID {
+	return professor.id
+}
