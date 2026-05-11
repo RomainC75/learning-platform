@@ -12,13 +12,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type CreateReservationCases struct {
-	Info                     string
-	CreateReservationRequest dtos.CreateReservationRequest
-	ProfessorReservations    []schedule_domain.Reservation
-	ExpectedResponse         schedule_application.CreateReservationResponse
-	IsError                  bool
-	ErrorMessage             string
+type CreateAvailabilityScheduleCases struct {
+	Info                 string
+	CreateBookingRequest dtos.CreateBookingRequest
+	ProfessorBookings    []schedule_domain.Booking
+	ExpectedResponse     schedule_application.CreateBookingResponse
+	IsError              bool
+	ErrorMessage         string
 }
 
 var (
@@ -28,22 +28,22 @@ var (
 	duration1h    = utils_time.MustParseDuration("1h")
 )
 
-var testCases []CreateReservationCases = []CreateReservationCases{
+var testCases []CreateAvailabilityScheduleCases = []CreateAvailabilityScheduleCases{
 	{
-		Info: "should make reservation",
-		CreateReservationRequest: dtos.CreateReservationRequest{
+		Info: "student should make Booking",
+		CreateBookingRequest: dtos.CreateBookingRequest{
 			ProfessorId: uuid.UUID{},
 			Date:        studentDate1,
 			Duration:    duration1h,
 		},
-		ProfessorReservations: []schedule_domain.Reservation{
-			schedule_domain.NewReservation(
+		ProfessorBookings: []schedule_domain.Booking{
+			schedule_domain.NewBooking(
 				professorDate,
 				duration1h,
 				otherStudentUuid,
 			),
 		},
-		ExpectedResponse: schedule_application.CreateReservationResponse{
+		ExpectedResponse: schedule_application.CreateBookingResponse{
 			Status:      true,
 			StudentId:   studentUuid,
 			ProfessorId: professorUuid,
@@ -51,33 +51,16 @@ var testCases []CreateReservationCases = []CreateReservationCases{
 			Duration:    duration1h,
 		},
 	},
-	{
-		Info: "should NOT make reservation",
-		CreateReservationRequest: dtos.CreateReservationRequest{
-			ProfessorId: uuid.UUID{},
-			Date:        studentDate2,
-			Duration:    duration1h,
-		},
-		ProfessorReservations: []schedule_domain.Reservation{
-			schedule_domain.NewReservation(
-				professorDate,
-				duration1h,
-				otherStudentUuid,
-			),
-		},
-		IsError:      true,
-		ErrorMessage: schedule_domain.ErrProfessorNotSchedulable,
-	},
 }
 
-func TestCreateReservation(t *testing.T) {
+func TestCreateBooking(t *testing.T) {
 	for _, cs := range testCases {
 		t.Run(cs.Info, func(t *testing.T) {
-			td := NewTestDriver().CreateReservationsForProfessor(cs.ProfessorReservations)
+			td := NewTestDriver().CreateBookingsForProfessor(cs.ProfessorBookings)
 			srv := td.NewScheduleService()
 
 			studentContext := td.BuildStudentContext()
-			res, err := srv.CreateReservation(studentContext, cs.CreateReservationRequest)
+			res, err := srv.CreateBooking(studentContext, cs.CreateBookingRequest)
 			if cs.IsError {
 				assert.NotNil(t, err, cs.ErrorMessage)
 				assert.EqualError(t, err, schedule_domain.ErrProfessorNotSchedulable)

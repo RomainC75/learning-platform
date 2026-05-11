@@ -24,9 +24,9 @@ type TestDriver struct {
 }
 
 func NewTestDriver() *TestDriver {
-	student := schedule_domain.NewStudent(studentUuid, "john", "Doe", []schedule_domain.Reservation{})
-	professor := schedule_domain.NewProfessor(professorUuid, "big", "brother", []schedule_domain.Reservation{
-		schedule_domain.NewReservation(
+	student := schedule_domain.NewStudent(studentUuid, "john", "Doe", []schedule_domain.Booking{})
+	professor := schedule_domain.NewProfessor(professorUuid, "big", "brother", []schedule_domain.Booking{
+		schedule_domain.NewBooking(
 			time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC),
 			utils_time.MustParseDuration("1h"),
 			otherStudentUuid,
@@ -40,7 +40,7 @@ func NewTestDriver() *TestDriver {
 
 }
 
-func (td *TestDriver) CreateReservationsForProfessor(rezas []schedule_domain.Reservation) *TestDriver {
+func (td *TestDriver) CreateBookingsForProfessor(rezas []schedule_domain.Booking) *TestDriver {
 	td.professor.ResetSchedule()
 	for _, reza := range rezas {
 		td.professor.MustAddSchedule(reza)
@@ -48,7 +48,7 @@ func (td *TestDriver) CreateReservationsForProfessor(rezas []schedule_domain.Res
 	return td
 }
 
-func (td *TestDriver) CreateReservationsForStudent(rezas ...schedule_domain.Reservation) *TestDriver {
+func (td *TestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking) *TestDriver {
 	td.student.ResetSchedule()
 	for _, reza := range rezas {
 		td.student.MustAddSchedule(reza)
@@ -56,10 +56,10 @@ func (td *TestDriver) CreateReservationsForStudent(rezas ...schedule_domain.Rese
 	return td
 }
 
-func (td *TestDriver) NewScheduleService() *schedule_application.ReservationSrv {
+func (td *TestDriver) NewScheduleService() *schedule_application.BookingSrv {
 	professors := schedule_infra.NewInMemProfRepo(td.professor, false)
 	students := schedule_infra.NewInMemStudentRepo(td.student, false)
-	return schedule_application.NewReservationSrv(professors, students)
+	return schedule_application.NewBookingSrv(professors, students)
 }
 
 func (td *TestDriver) BuildStudentContext() context.Context {
