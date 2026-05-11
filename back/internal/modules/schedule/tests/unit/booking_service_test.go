@@ -56,7 +56,7 @@ var testCases []CreateAvailabilityScheduleCases = []CreateAvailabilityScheduleCa
 func TestCreateBooking(t *testing.T) {
 	for _, cs := range testCases {
 		t.Run(cs.Info, func(t *testing.T) {
-			td := NewTestDriver().CreateBookingsForProfessor(cs.ProfessorBookings)
+			td := NewBookingTestDriver().CreateBookingsForProfessor(cs.ProfessorBookings)
 			srv := td.NewScheduleService()
 
 			studentContext := td.BuildStudentContext()

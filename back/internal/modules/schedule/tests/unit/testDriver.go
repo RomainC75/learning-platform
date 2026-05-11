@@ -18,12 +18,12 @@ var (
 	otherStudentUuid = uuid.MustParse("d8faff5b-8692-4e76-a240-ae77f66db979")
 )
 
-type TestDriver struct {
+type BookingTestDriver struct {
 	professor *schedule_domain.Professor
 	student   *schedule_domain.Student
 }
 
-func NewTestDriver() *TestDriver {
+func NewBookingTestDriver() *BookingTestDriver {
 	student := schedule_domain.NewStudent(studentUuid, "john", "Doe", []schedule_domain.Booking{})
 	professor := schedule_domain.NewProfessor(professorUuid, "big", "brother", []schedule_domain.Booking{
 		schedule_domain.NewBooking(
@@ -33,14 +33,14 @@ func NewTestDriver() *TestDriver {
 		),
 	})
 
-	return &TestDriver{
+	return &BookingTestDriver{
 		professor: professor,
 		student:   student,
 	}
 
 }
 
-func (td *TestDriver) CreateBookingsForProfessor(rezas []schedule_domain.Booking) *TestDriver {
+func (td *BookingTestDriver) CreateBookingsForProfessor(rezas []schedule_domain.Booking) *BookingTestDriver {
 	td.professor.ResetSchedule()
 	for _, reza := range rezas {
 		td.professor.MustAddSchedule(reza)
@@ -48,7 +48,7 @@ func (td *TestDriver) CreateBookingsForProfessor(rezas []schedule_domain.Booking
 	return td
 }
 
-func (td *TestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking) *TestDriver {
+func (td *BookingTestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking) *BookingTestDriver {
 	td.student.ResetSchedule()
 	for _, reza := range rezas {
 		td.student.MustAddSchedule(reza)
@@ -56,13 +56,13 @@ func (td *TestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking)
 	return td
 }
 
-func (td *TestDriver) NewScheduleService() *schedule_application.BookingSrv {
+func (td *BookingTestDriver) NewScheduleService() *schedule_application.BookingSrv {
 	professors := schedule_infra.NewInMemProfRepo(td.professor, false)
 	students := schedule_infra.NewInMemStudentRepo(td.student, false)
 	return schedule_application.NewBookingSrv(professors, students)
 }
 
-func (td *TestDriver) BuildStudentContext() context.Context {
+func (td *BookingTestDriver) BuildStudentContext() context.Context {
 	ctx := context.Background()
 	return context.WithValue(ctx, auth_jwt.UserId, studentUuid)
 }
