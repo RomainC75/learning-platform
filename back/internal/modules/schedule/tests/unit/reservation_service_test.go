@@ -13,22 +13,25 @@ import (
 )
 
 type CreateReservationCases struct {
+	Info                     string
 	CreateReservationRequest dtos.CreateReservationRequest
 	ProfessorReservations    []schedule_domain.Reservation
 	ExpectedResponse         schedule_application.CreateReservationResponse
 }
 
 var (
-	studentDate   = time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC)
+	studentDate1  = time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC)
+	studentDate2  = time.Date(2026, time.May, 9, 10, 30, 0, 0, time.UTC)
 	professorDate = time.Date(2026, time.May, 9, 11, 0, 0, 0, time.UTC)
 	duration1h    = utils_time.MustParseDuration("1h")
 )
 
 var testCases []CreateReservationCases = []CreateReservationCases{
 	{
+		Info: "should make reservation",
 		CreateReservationRequest: dtos.CreateReservationRequest{
 			ProfessorId: uuid.UUID{},
-			Date:        studentDate,
+			Date:        studentDate1,
 			Duration:    duration1h,
 		},
 		ProfessorReservations: []schedule_domain.Reservation{
@@ -42,7 +45,29 @@ var testCases []CreateReservationCases = []CreateReservationCases{
 			Status:      true,
 			StudentId:   studentUuid,
 			ProfessorId: professorUuid,
-			Date:        studentDate,
+			Date:        studentDate1,
+			Duration:    duration1h,
+		},
+	},
+	{
+		Info: "should NOT make reservation",
+		CreateReservationRequest: dtos.CreateReservationRequest{
+			ProfessorId: uuid.UUID{},
+			Date:        studentDate2,
+			Duration:    duration1h,
+		},
+		ProfessorReservations: []schedule_domain.Reservation{
+			schedule_domain.NewReservation(
+				professorDate,
+				duration1h,
+				otherStudentUuid,
+			),
+		},
+		ExpectedResponse: schedule_application.CreateReservationResponse{
+			Status:      false,
+			StudentId:   studentUuid,
+			ProfessorId: professorUuid,
+			Date:        studentDate2,
 			Duration:    duration1h,
 		},
 	},
@@ -50,12 +75,14 @@ var testCases []CreateReservationCases = []CreateReservationCases{
 
 func TestCreateReservation(t *testing.T) {
 	for _, cs := range testCases {
-		td := NewTestDriver().CreateReservationsForProfessor(cs.ProfessorReservations)
-		srv := td.NewScheduleService()
+		t.Run(cs.Info, func(t *testing.T) {
+			td := NewTestDriver().CreateReservationsForProfessor(cs.ProfessorReservations)
+			srv := td.NewScheduleService()
 
-		studentContext := td.BuildStudentContext()
-		res, err := srv.CreateReservation(studentContext, cs.CreateReservationRequest)
-		assert.Nil(t, err)
-		assert.Equal(t, cs.ExpectedResponse, res)
+			studentContext := td.BuildStudentContext()
+			res, err := srv.CreateReservation(studentContext, cs.CreateReservationRequest)
+			assert.Nil(t, err)
+			assert.Equal(t, cs.ExpectedResponse, res)
+		})
 	}
 }
