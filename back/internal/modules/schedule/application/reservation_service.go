@@ -40,14 +40,17 @@ func (reservationSrv *ReservationSrv) CreateReservation(ctx context.Context, cre
 
 	newReservation := schedule_domain.NewReservation(createReservationRequest.Date, createReservationRequest.Duration, studentId)
 	err = foundProfessor.Schedule(newReservation)
+	if err != nil {
+		return CreateReservationResponse{}, err
+	}
 
-	var status bool
-	if err == nil {
-		status = true
+	err = reservationSrv.professors.AddReservation(foundProfessor, newReservation)
+	if err != nil {
+		return CreateReservationResponse{}, err
 	}
 
 	return CreateReservationResponse{
-		Status:      status,
+		Status:      true,
 		StudentId:   studentId,
 		ProfessorId: foundProfessor.Id(),
 		Date:        createReservationRequest.Date,

@@ -17,6 +17,8 @@ type CreateReservationCases struct {
 	CreateReservationRequest dtos.CreateReservationRequest
 	ProfessorReservations    []schedule_domain.Reservation
 	ExpectedResponse         schedule_application.CreateReservationResponse
+	IsError                  bool
+	ErrorMessage             string
 }
 
 var (
@@ -63,13 +65,8 @@ var testCases []CreateReservationCases = []CreateReservationCases{
 				otherStudentUuid,
 			),
 		},
-		ExpectedResponse: schedule_application.CreateReservationResponse{
-			Status:      false,
-			StudentId:   studentUuid,
-			ProfessorId: professorUuid,
-			Date:        studentDate2,
-			Duration:    duration1h,
-		},
+		IsError:      true,
+		ErrorMessage: schedule_domain.ErrProfessorNotSchedulable,
 	},
 }
 
@@ -81,8 +78,13 @@ func TestCreateReservation(t *testing.T) {
 
 			studentContext := td.BuildStudentContext()
 			res, err := srv.CreateReservation(studentContext, cs.CreateReservationRequest)
-			assert.Nil(t, err)
-			assert.Equal(t, cs.ExpectedResponse, res)
+			if cs.IsError {
+				assert.NotNil(t, err, cs.ErrorMessage)
+				assert.EqualError(t, err, schedule_domain.ErrProfessorNotSchedulable)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, cs.ExpectedResponse, res)
+			}
 		})
 	}
 }

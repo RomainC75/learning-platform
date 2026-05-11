@@ -9,6 +9,7 @@ import (
 
 type InMemProfRepo struct {
 	expectedProfessor *schedule_domain.Professor
+	addedReservation  []schedule_domain.Reservation
 	isErrorExpected   bool
 }
 
@@ -24,4 +25,8 @@ func (profRepo *InMemProfRepo) Get(id uuid.UUID) (*schedule_domain.Professor, er
 		return nil, errors.New(schedule_domain.ErrProfessorNotFound)
 	}
 	return profRepo.expectedProfessor, nil
+}
+
+func (profRepo *InMemProfRepo) AddReservation(professor *schedule_domain.Professor, reservation schedule_domain.Reservation) error {
+	return nil
 }
