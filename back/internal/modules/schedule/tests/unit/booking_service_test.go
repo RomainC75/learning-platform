@@ -4,15 +4,13 @@ import (
 	dtos "language-learning/internal/api/dtos/request"
 	schedule_application "language-learning/internal/modules/schedule/application"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
-	utils_time "language-learning/utils/time"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
-type CreateAvailabilityScheduleCases struct {
+type CreateBookingCases struct {
 	Info                 string
 	CreateBookingRequest dtos.CreateBookingRequest
 	ProfessorBookings    []schedule_domain.Booking
@@ -21,14 +19,7 @@ type CreateAvailabilityScheduleCases struct {
 	ErrorMessage         string
 }
 
-var (
-	studentDate1  = time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC)
-	studentDate2  = time.Date(2026, time.May, 9, 10, 30, 0, 0, time.UTC)
-	professorDate = time.Date(2026, time.May, 9, 11, 0, 0, 0, time.UTC)
-	duration1h    = utils_time.MustParseDuration("1h")
-)
-
-var testCases []CreateAvailabilityScheduleCases = []CreateAvailabilityScheduleCases{
+var bookingTestCases []CreateBookingCases = []CreateBookingCases{
 	{
 		Info: "student should make Booking",
 		CreateBookingRequest: dtos.CreateBookingRequest{
@@ -54,7 +45,7 @@ var testCases []CreateAvailabilityScheduleCases = []CreateAvailabilityScheduleCa
 }
 
 func TestCreateBooking(t *testing.T) {
-	for _, cs := range testCases {
+	for _, cs := range bookingTestCases {
 		t.Run(cs.Info, func(t *testing.T) {
 			td := NewBookingTestDriver().CreateBookingsForProfessor(cs.ProfessorBookings)
 			srv := td.NewScheduleService()

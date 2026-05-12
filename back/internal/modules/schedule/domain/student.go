@@ -1,6 +1,8 @@
 package schedule_domain
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Student struct {
 	id        uuid.UUID

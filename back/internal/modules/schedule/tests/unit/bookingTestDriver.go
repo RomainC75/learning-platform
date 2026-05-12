@@ -8,14 +8,6 @@ import (
 	schedule_infra "language-learning/internal/modules/schedule/infra"
 	utils_time "language-learning/utils/time"
 	"time"
-
-	"github.com/google/uuid"
-)
-
-var (
-	studentUuid      = uuid.MustParse("3d30a9c8-5768-4d73-ab5d-8d36cab7f03f")
-	professorUuid    = uuid.MustParse("22ce4a72-2978-4f19-9181-e59963add95b")
-	otherStudentUuid = uuid.MustParse("d8faff5b-8692-4e76-a240-ae77f66db979")
 )
 
 type BookingTestDriver struct {
