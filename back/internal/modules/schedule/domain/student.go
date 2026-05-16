@@ -20,10 +20,10 @@ func NewStudent(id uuid.UUID, firstName string, lastName string, Booking []Booki
 	}
 }
 
-func (student *Student) MustAddSchedule(newReza Booking) {
+func (student *Student) MustAddBooking(newReza Booking) {
 	student.Bookings = append(student.Bookings, newReza)
 }
 
-func (student *Student) ResetSchedule() {
+func (student *Student) ResetBooking() {
 	student.Bookings = []Booking{}
 }
