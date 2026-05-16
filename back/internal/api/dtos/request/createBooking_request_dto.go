@@ -1,4 +1,4 @@
-package dtos
+package dtos_requests
 
 import (
 	"time"
