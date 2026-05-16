@@ -17,7 +17,7 @@ type BookingTestDriver struct {
 
 func NewBookingTestDriver() *BookingTestDriver {
 	student := schedule_domain.NewStudent(studentUuid, "john", "Doe", []schedule_domain.Booking{})
-	professor := schedule_domain.NewProfessor(professorUuid, "big", "brother", []schedule_domain.Booking{
+	professor := schedule_domain.NewProfessor(professorUuid, "big", "brother", schedule_domain.Schedule{}, []schedule_domain.Booking{
 		schedule_domain.NewBooking(
 			time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC),
 			utils_time.MustParseDuration("1h"),
@@ -33,17 +33,17 @@ func NewBookingTestDriver() *BookingTestDriver {
 }
 
 func (td *BookingTestDriver) CreateBookingsForProfessor(rezas []schedule_domain.Booking) *BookingTestDriver {
-	td.professor.ResetSchedule()
+	td.professor.ResetBooking()
 	for _, reza := range rezas {
-		td.professor.MustAddSchedule(reza)
+		td.professor.MustAddBooking(reza)
 	}
 	return td
 }
 
 func (td *BookingTestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking) *BookingTestDriver {
-	td.student.ResetSchedule()
+	td.student.ResetBooking()
 	for _, reza := range rezas {
-		td.student.MustAddSchedule(reza)
+		td.student.MustAddBooking(reza)
 	}
 	return td
 }
