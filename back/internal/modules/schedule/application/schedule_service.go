@@ -3,9 +3,10 @@ package schedule_application
 import (
 	"context"
 	dtos "language-learning/internal/api/dtos/request"
+	dtos_responses "language-learning/internal/api/dtos/responses"
 	auth_jwt "language-learning/internal/auth/jwt"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
-	"time"
+	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 
 	"github.com/google/uuid"
 )
@@ -14,44 +15,41 @@ type ScheduleSrv struct {
 	professors schedule_domain.Professors
 }
 
-type CreateFreeScheduleResponse struct {
-	Status      bool          `json:"status"`
-	StudentId   uuid.UUID     `json:"student_id"`
-	ProfessorId uuid.UUID     `json:"professor_id"`
-	Date        time.Time     `json:"date"`
-	Duration    time.Duration `json:"duration"`
-}
-
-func NewScheduleSrv(professors schedule_domain.Professors, students schedule_domain.Students) *ScheduleSrv {
+func NewScheduleSrv(professors schedule_domain.Professors) *ScheduleSrv {
 	return &ScheduleSrv{
 		professors: professors,
 	}
 }
 
-func (ScheduleSrv *ScheduleSrv) CreateBooking(ctx context.Context, createBookingRequest dtos.CreateBookingRequest) (CreateFreeScheduleResponse, error) {
-	foundProfessor, err := ScheduleSrv.professors.Get(createBookingRequest.ProfessorId)
+func (ScheduleSrv *ScheduleSrv) CreateSchedule(ctx context.Context, createBookingRequest dtos.CreateScheduleRequest) (dtos_responses.CreateScheduleResponse, error) {
+	professorId := ctx.Value(auth_jwt.UserId).(uuid.UUID)
+	foundProfessor, err := ScheduleSrv.professors.Get(professorId)
 	if err != nil {
-		return CreateFreeScheduleResponse{}, err
+		return dtos_responses.CreateScheduleResponse{}, err
 	}
 
-	studentId, _ := ctx.Value(auth_jwt.UserId).(uuid.UUID)
-
-	newBooking := schedule_domain.NewBooking(createBookingRequest.Date, createBookingRequest.Duration, studentId)
-	err = foundProfessor.Schedule(newBooking)
-	if err != nil {
-		return CreateFreeScheduleResponse{}, err
+	weekAvailabilities := make([]schedule_domain.WeeklyAvailability, 0, len(createBookingRequest.WeeklyAvailabilities))
+	for _, wa := range createBookingRequest.WeeklyAvailabilities {
+		localTime, _ := shared_domain_time.NewLocalTime24(wa.TimeRange.LocalTimeStart.Hour, wa.TimeRange.LocalTimeStart.Minute)
+		timeRange := shared_domain_time.NewTimeRange(localTime, wa.TimeRange.Duration)
+		weekAvailability := schedule_domain.NewWeeklyAvailability(wa.Day, timeRange)
+		weekAvailabilities = append(weekAvailabilities, weekAvailability)
 	}
 
-	err = ScheduleSrv.professors.AddBooking(foundProfessor, newBooking)
-	if err != nil {
-		return CreateFreeScheduleResponse{}, err
+	exceptions := make([]schedule_domain.AvailabilityException, 0, len(createBookingRequest.AvailabilityExceptions))
+	for _, ae := range createBookingRequest.AvailabilityExceptions {
+		dateRangeTime := shared_domain_time.NewDateTimeRange(ae.DateTimeRange.Start, ae.DateTimeRange.Duration)
+		exception := schedule_domain.NewAvailabilityException(dateRangeTime)
+		exceptions = append(exceptions, exception)
 	}
 
-	return CreateFreeScheduleResponse{
-		Status:      true,
-		StudentId:   studentId,
-		ProfessorId: foundProfessor.Id(),
-		Date:        createBookingRequest.Date,
-		Duration:    createBookingRequest.Duration,
-	}, nil
+	newSchedule := schedule_domain.NewSchedule(weekAvailabilities, exceptions)
+	foundProfessor.SetSchedule(newSchedule)
+
+	err = ScheduleSrv.professors.ReplaceSchedule(foundProfessor, newSchedule)
+	if err != nil {
+		return dtos_responses.CreateScheduleResponse{}, err
+	}
+
+	return dtos_responses.ToCreateScheduleResponse(newSchedule), nil
 }
