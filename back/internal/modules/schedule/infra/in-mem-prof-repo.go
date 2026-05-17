@@ -33,6 +33,7 @@ func (profRepo *InMemProfRepo) AddBooking(professor *schedule_domain.Professor, 
 }
 
 func (profRepo *InMemProfRepo) ReplaceSchedule(professor *schedule_domain.Professor, schedule schedule_domain.Schedule) error {
+	profRepo.savedSchedule = schedule
 	return nil
 }
 

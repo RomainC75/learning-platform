@@ -28,6 +28,18 @@ func (ScheduleSrv *ScheduleSrv) CreateSchedule(ctx context.Context, createBookin
 		return dtos_responses.CreateScheduleResponse{}, err
 	}
 
+	newSchedule := NewScheduleFromDto(createBookingRequest)
+	foundProfessor.SetSchedule(newSchedule)
+
+	err = ScheduleSrv.professors.ReplaceSchedule(foundProfessor, newSchedule)
+	if err != nil {
+		return dtos_responses.CreateScheduleResponse{}, err
+	}
+
+	return dtos_responses.ToCreateScheduleResponse(newSchedule), nil
+}
+
+func NewScheduleFromDto(createBookingRequest dtos.CreateScheduleRequest) schedule_domain.Schedule {
 	weekAvailabilities := make([]schedule_domain.WeeklyAvailability, 0, len(createBookingRequest.WeeklyAvailabilities))
 	for _, wa := range createBookingRequest.WeeklyAvailabilities {
 		localTime, _ := shared_domain_time.NewLocalTime24(wa.TimeRange.LocalTimeStart.Hour, wa.TimeRange.LocalTimeStart.Minute)
@@ -42,14 +54,5 @@ func (ScheduleSrv *ScheduleSrv) CreateSchedule(ctx context.Context, createBookin
 		exception := schedule_domain.NewAvailabilityException(dateRangeTime)
 		exceptions = append(exceptions, exception)
 	}
-
-	newSchedule := schedule_domain.NewSchedule(weekAvailabilities, exceptions)
-	foundProfessor.SetSchedule(newSchedule)
-
-	err = ScheduleSrv.professors.ReplaceSchedule(foundProfessor, newSchedule)
-	if err != nil {
-		return dtos_responses.CreateScheduleResponse{}, err
-	}
-
-	return dtos_responses.ToCreateScheduleResponse(newSchedule), nil
+	return schedule_domain.NewSchedule(weekAvailabilities, exceptions)
 }

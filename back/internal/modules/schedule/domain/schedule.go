@@ -1,6 +1,8 @@
 package schedule_domain
 
-import "slices"
+import (
+	"slices"
+)
 
 type Schedule struct {
 	weeklyAvailabilities   []WeeklyAvailability
