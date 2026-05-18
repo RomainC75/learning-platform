@@ -5,14 +5,17 @@ import (
 	dtos_requests "language-learning/internal/api/dtos/request"
 	auth_jwt "language-learning/internal/auth/jwt"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
+	shared_domain_uuid "language-learning/internal/modules/shared/domain/uuid"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type BookingSrv struct {
-	professors schedule_domain.Professors
-	students   schedule_domain.Students
+	idGenerator shared_domain_uuid.UuidGenerator
+	professors  schedule_domain.Professors
+	students    schedule_domain.Students
+	bookings    schedule_domain.Bookings
 }
 
 type CreateBookingResponse struct {
@@ -23,10 +26,12 @@ type CreateBookingResponse struct {
 	Duration    time.Duration `json:"duration"`
 }
 
-func NewBookingSrv(professors schedule_domain.Professors, students schedule_domain.Students) *BookingSrv {
+func NewBookingSrv(uuidGenerator shared_domain_uuid.UuidGenerator, professors schedule_domain.Professors, students schedule_domain.Students, bookings schedule_domain.Bookings) *BookingSrv {
 	return &BookingSrv{
-		professors: professors,
-		students:   students,
+		idGenerator: uuidGenerator,
+		professors:  professors,
+		students:    students,
+		bookings:    bookings,
 	}
 }
 
@@ -37,14 +42,15 @@ func (bookingSrv *BookingSrv) CreateBooking(ctx context.Context, createBookingRe
 	}
 
 	studentId, _ := ctx.Value(auth_jwt.UserId).(uuid.UUID)
-
-	newBooking := schedule_domain.NewBooking(createBookingRequest.Date, createBookingRequest.Duration, studentId)
-	err = foundProfessor.Booking(newBooking)
+	student, err := bookingSrv.students.Get(studentId)
 	if err != nil {
 		return CreateBookingResponse{}, err
 	}
 
-	err = bookingSrv.professors.AddBooking(foundProfessor, newBooking)
+	newBookingUuid := bookingSrv.idGenerator.Generate()
+	newBooking := schedule_domain.NewBooking(newBookingUuid, createBookingRequest.Date, createBookingRequest.Duration, foundProfessor, student)
+
+	err = bookingSrv.bookings.SetBooking(newBooking)
 	if err != nil {
 		return CreateBookingResponse{}, err
 	}

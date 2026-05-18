@@ -7,26 +7,45 @@ import (
 )
 
 type Booking struct {
-	date     time.Time
-	duration time.Duration
-	with     uuid.UUID
+	id        uuid.UUID
+	date      time.Time
+	duration  time.Duration
+	professor *Professor
+	student   *Student
 }
 
-func NewBooking(date time.Time, duration time.Duration, with uuid.UUID) Booking {
+type BookingSnapshot struct {
+	Id        uuid.UUID
+	Date      time.Time
+	Duration  time.Duration
+	Professor *Professor
+	Student   *Student
+}
+
+func NewBooking(id uuid.UUID, date time.Time, duration time.Duration, professor *Professor, student *Student) Booking {
 	return Booking{
-		date:     date,
-		duration: duration,
-		with:     with,
+		id:        id,
+		date:      date,
+		duration:  duration,
+		professor: professor,
+		student:   student,
 	}
 }
 
-func (booking Booking) isBookableIn(schedule []Booking) bool {
-	for _, sch := range schedule {
-		reza_end := booking.date.Add(booking.duration)
-		sch_end := sch.date.Add(sch.duration)
-		if (booking.date.After(sch.date) && booking.date.Before(sch_end)) || (reza_end.After(sch.date) && reza_end.Before(sch_end)) {
-			return false
-		}
+func (b *Booking) GetEndDate() time.Time {
+	return b.date.Add(b.duration)
+}
+
+func (b *Booking) GetStartDate() time.Time {
+	return b.date
+}
+
+func (b *Booking) ToSnapshot() *BookingSnapshot {
+	return &BookingSnapshot{
+		Id:        b.id,
+		Date:      b.date,
+		Duration:  b.duration,
+		Professor: b.professor,
+		Student:   b.student,
 	}
-	return true
 }

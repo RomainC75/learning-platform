@@ -39,13 +39,8 @@ func NewScheduleTestDriver() *ScheduleTestDriver {
 				),
 			),
 		},
-	), []schedule_domain.Booking{
-		schedule_domain.NewBooking(
-			time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC),
-			utils_time.MustParseDuration("1h"),
-			otherStudentUuid,
-		),
-	})
+	))
+
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, auth_jwt.UserId, professorUuid)
 	return &ScheduleTestDriver{

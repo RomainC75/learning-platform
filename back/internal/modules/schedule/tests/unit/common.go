@@ -1,6 +1,7 @@
 package schedule_unit
 
 import (
+	schedule_domain "language-learning/internal/modules/schedule/domain"
 	utils_time "language-learning/utils/time"
 	"time"
 
@@ -8,9 +9,12 @@ import (
 )
 
 var (
-	studentUuid      = uuid.MustParse("3d30a9c8-5768-4d73-ab5d-8d36cab7f03f")
-	professorUuid    = uuid.MustParse("22ce4a72-2978-4f19-9181-e59963add95b")
-	otherStudentUuid = uuid.MustParse("d8faff5b-8692-4e76-a240-ae77f66db979")
+	professorUuid = uuid.MustParse("22ce4a72-2978-4f19-9181-e59963add95b")
+	studentUuid   = uuid.MustParse("3d30a9c8-5768-4d73-ab5d-8d36cab7f03f")
+	studentUuid2  = uuid.MustParse("d8faff5b-8692-4e76-a240-ae77f66db979")
+	bookingUuid   = uuid.MustParse("76d0f1d9-a7fe-4783-bd81-b51fc409aab9")
+	professor     = schedule_domain.NewProfessor(professorUuid, "John", "Doe", schedule_domain.Schedule{})
+	student       = schedule_domain.NewStudent(studentUuid, "Jane", "Smith")
 )
 
 var (

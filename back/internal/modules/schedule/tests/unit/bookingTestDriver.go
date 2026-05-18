@@ -2,59 +2,68 @@ package schedule_unit
 
 import (
 	"context"
+	dtos_requests "language-learning/internal/api/dtos/request"
 	auth_jwt "language-learning/internal/auth/jwt"
 	schedule_application "language-learning/internal/modules/schedule/application"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
 	schedule_infra "language-learning/internal/modules/schedule/infra"
-	utils_time "language-learning/utils/time"
-	"time"
+	shared_infra "language-learning/internal/modules/shared/infra"
 )
 
 type BookingTestDriver struct {
-	professor *schedule_domain.Professor
-	student   *schedule_domain.Student
+	uuidGenerator *shared_infra.InMemUuidGenerator
+	professor     *schedule_domain.Professor
+	student       *schedule_domain.Student
+	bookings      *schedule_infra.InMemBookingRepo
+	bookingSrv    *schedule_application.BookingSrv
 }
 
 func NewBookingTestDriver() *BookingTestDriver {
-	student := schedule_domain.NewStudent(studentUuid, "john", "Doe", []schedule_domain.Booking{})
-	professor := schedule_domain.NewProfessor(professorUuid, "big", "brother", schedule_domain.Schedule{}, []schedule_domain.Booking{
-		schedule_domain.NewBooking(
-			time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC),
-			utils_time.MustParseDuration("1h"),
-			otherStudentUuid,
-		),
-	})
+	uuidGenerator := shared_infra.NewInMemUuidGenerator(bookingUuid)
+
+	bookings := schedule_infra.NewInMemBookingRepo()
 
 	return &BookingTestDriver{
-		professor: professor,
-		student:   student,
+		uuidGenerator: uuidGenerator,
+		professor:     professor,
+		student:       student,
+		bookings:      bookings,
 	}
 
 }
 
 func (td *BookingTestDriver) CreateBookingsForProfessor(rezas []schedule_domain.Booking) *BookingTestDriver {
-	td.professor.ResetBooking()
+	td.bookings.ResetBooking()
 	for _, reza := range rezas {
-		td.professor.MustAddBooking(reza)
+		td.bookings.MustAddBooking(reza)
 	}
 	return td
 }
 
-func (td *BookingTestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking) *BookingTestDriver {
-	td.student.ResetBooking()
-	for _, reza := range rezas {
-		td.student.MustAddBooking(reza)
-	}
-	return td
-}
+// func (td *BookingTestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking) *BookingTestDriver {
+// 	td.student.ResetBooking()
+// 	for _, reza := range rezas {
+// 		td.student.MustAddBooking(reza)
+// 	}
+// 	return td
+// }
 
 func (td *BookingTestDriver) NewScheduleService() *schedule_application.BookingSrv {
 	professors := schedule_infra.NewInMemProfRepo(td.professor, false)
 	students := schedule_infra.NewInMemStudentRepo(td.student, false)
-	return schedule_application.NewBookingSrv(professors, students)
+	td.bookingSrv = schedule_application.NewBookingSrv(td.uuidGenerator, professors, students, td.bookings)
+	return td.bookingSrv
 }
 
 func (td *BookingTestDriver) BuildStudentContext() context.Context {
 	ctx := context.Background()
 	return context.WithValue(ctx, auth_jwt.UserId, studentUuid)
+}
+
+func (td *BookingTestDriver) SavedBookings() []schedule_domain.Booking {
+	return td.bookings.ListBookings()
+}
+
+func (td *BookingTestDriver) CreateBooking(ctx context.Context, createBookingRequest dtos_requests.CreateBookingRequest) (schedule_application.CreateBookingResponse, error) {
+	return td.bookingSrv.CreateBooking(ctx, createBookingRequest)
 }
