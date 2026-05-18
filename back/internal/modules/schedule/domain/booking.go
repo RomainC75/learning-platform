@@ -12,6 +12,7 @@ type Booking struct {
 	duration  time.Duration
 	professor *Professor
 	student   *Student
+	createdAt time.Time
 }
 
 type BookingSnapshot struct {
@@ -20,15 +21,17 @@ type BookingSnapshot struct {
 	Duration  time.Duration
 	Professor *Professor
 	Student   *Student
+	CreatedAt time.Time
 }
 
-func NewBooking(id uuid.UUID, date time.Time, duration time.Duration, professor *Professor, student *Student) Booking {
+func NewBooking(id uuid.UUID, date time.Time, duration time.Duration, professor *Professor, student *Student, createdAt time.Time) Booking {
 	return Booking{
 		id:        id,
 		date:      date,
 		duration:  duration,
 		professor: professor,
 		student:   student,
+		createdAt: createdAt,
 	}
 }
 
@@ -47,5 +50,6 @@ func (b *Booking) ToSnapshot() *BookingSnapshot {
 		Duration:  b.duration,
 		Professor: b.professor,
 		Student:   b.student,
+		CreatedAt: b.createdAt,
 	}
 }

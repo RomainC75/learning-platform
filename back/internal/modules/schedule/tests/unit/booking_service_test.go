@@ -1,7 +1,6 @@
 package schedule_unit
 
 import (
-	"fmt"
 	dtos "language-learning/internal/api/dtos/request"
 	schedule_application "language-learning/internal/modules/schedule/application"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
@@ -21,15 +20,16 @@ type CreateBookingCase struct {
 }
 
 var (
-	newBooking = schedule_domain.NewBooking(
+	controlBooking = schedule_domain.NewBooking(
 		bookingUuid,
 		professorDate,
 		duration1h,
 		professor,
 		student,
+		nowjuly1,
 	)
-	newBookings = []schedule_domain.Booking{
-		newBooking,
+	controlBookings = []schedule_domain.Booking{
+		controlBooking,
 	}
 
 	bookingTestCases []CreateBookingCase = []CreateBookingCase{
@@ -40,7 +40,7 @@ var (
 				Date:        professorDate,
 				Duration:    duration1h,
 			},
-			Bookings: newBookings,
+			Bookings: controlBookings,
 			ExpectedResponse: schedule_application.CreateBookingResponse{
 				Status:      true,
 				StudentId:   studentUuid,
@@ -56,7 +56,6 @@ func TestCreateBooking(t *testing.T) {
 	for _, cs := range bookingTestCases {
 		t.Run(cs.Info, func(t *testing.T) {
 			td := NewBookingTestDriver()
-			fmt.Println("===> BEFORE : ", td.SavedBookings())
 			_ = td.NewScheduleService()
 
 			studentContext := td.BuildStudentContext()
@@ -67,8 +66,8 @@ func TestCreateBooking(t *testing.T) {
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, cs.ExpectedResponse, res)
-				for i := range newBookings {
-					assert.Equal(t, newBookings[i].ToSnapshot(), td.SavedBookings()[i].ToSnapshot())
+				for i := range controlBookings {
+					assert.Equal(t, controlBookings[i].ToSnapshot(), td.SavedBookings()[i].ToSnapshot())
 				}
 			}
 		})

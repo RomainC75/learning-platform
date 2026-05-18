@@ -22,6 +22,8 @@ var (
 	studentDate2  = time.Date(2026, time.May, 9, 10, 30, 0, 0, time.UTC)
 	professorDate = time.Date(2026, time.May, 9, 11, 0, 0, 0, time.UTC)
 	july25        = time.Date(2026, time.July, 25, 12, 0, 0, 0, time.UTC)
+	nowjuly1      = time.Date(2026, time.July, 1, 12, 0, 0, 0, time.UTC)
+	nowjuly2      = time.Date(2026, time.July, 2, 12, 0, 0, 0, time.UTC)
 	duration1h    = utils_time.MustParseDuration("1h")
 	duration4h    = utils_time.MustParseDuration("4h")
 	duration1Week = utils_time.MustParseDuration("168h")

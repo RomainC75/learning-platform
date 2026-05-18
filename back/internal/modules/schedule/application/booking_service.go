@@ -5,6 +5,7 @@ import (
 	dtos_requests "language-learning/internal/api/dtos/request"
 	auth_jwt "language-learning/internal/auth/jwt"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
+	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 	shared_domain_uuid "language-learning/internal/modules/shared/domain/uuid"
 	"time"
 
@@ -12,10 +13,11 @@ import (
 )
 
 type BookingSrv struct {
-	idGenerator shared_domain_uuid.UuidGenerator
-	professors  schedule_domain.Professors
-	students    schedule_domain.Students
-	bookings    schedule_domain.Bookings
+	idGenerator   shared_domain_uuid.UuidGenerator
+	professors    schedule_domain.Professors
+	students      schedule_domain.Students
+	bookings      schedule_domain.Bookings
+	timeGenerator shared_domain_time.TimeGenerator
 }
 
 type CreateBookingResponse struct {
@@ -26,12 +28,13 @@ type CreateBookingResponse struct {
 	Duration    time.Duration `json:"duration"`
 }
 
-func NewBookingSrv(uuidGenerator shared_domain_uuid.UuidGenerator, professors schedule_domain.Professors, students schedule_domain.Students, bookings schedule_domain.Bookings) *BookingSrv {
+func NewBookingSrv(uuidGenerator shared_domain_uuid.UuidGenerator, timeGenerator shared_domain_time.TimeGenerator, professors schedule_domain.Professors, students schedule_domain.Students, bookings schedule_domain.Bookings) *BookingSrv {
 	return &BookingSrv{
-		idGenerator: uuidGenerator,
-		professors:  professors,
-		students:    students,
-		bookings:    bookings,
+		idGenerator:   uuidGenerator,
+		timeGenerator: timeGenerator,
+		professors:    professors,
+		students:      students,
+		bookings:      bookings,
 	}
 }
 
@@ -48,7 +51,7 @@ func (bookingSrv *BookingSrv) CreateBooking(ctx context.Context, createBookingRe
 	}
 
 	newBookingUuid := bookingSrv.idGenerator.Generate()
-	newBooking := schedule_domain.NewBooking(newBookingUuid, createBookingRequest.Date, createBookingRequest.Duration, foundProfessor, student)
+	newBooking := schedule_domain.NewBooking(newBookingUuid, createBookingRequest.Date, createBookingRequest.Duration, foundProfessor, student, bookingSrv.timeGenerator.Now())
 
 	err = bookingSrv.bookings.SetBooking(newBooking)
 	if err != nil {
