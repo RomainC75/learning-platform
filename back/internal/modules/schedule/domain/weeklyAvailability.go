@@ -28,3 +28,7 @@ func (wa WeeklyAvailability) ToSnapshot() WeeklyAvailabilitySnapshot {
 		TimeRange: wa.timeRange.ToSnapshot(),
 	}
 }
+
+func (wa WeeklyAvailability) IsMatchWith(newBooking Booking) bool {
+	return wa.day == newBooking.StartDate().Weekday() && wa.timeRange.IsContaining(newBooking.DateTimeRange())
+}
