@@ -6,5 +6,6 @@ var (
 
 type Bookings interface {
 	SetBooking(booking Booking) error
+	GetBookings(professor *Professor) []Booking
 	ResetBooking()
 }

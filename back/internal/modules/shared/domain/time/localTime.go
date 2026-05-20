@@ -39,6 +39,10 @@ func MustLocalTime24(hour int, min int) LocalTime {
 	return localTime
 }
 
+func (lt LocalTime) StartInMinutesAfter00h() int {
+	return lt.hour*60 + lt.minute
+}
+
 func (lt LocalTime) ToSnapshot() LocalTimeSnapshot {
 	return LocalTimeSnapshot{
 		Hour:   lt.hour,

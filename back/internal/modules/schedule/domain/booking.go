@@ -1,55 +1,56 @@
 package schedule_domain
 
 import (
+	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type Booking struct {
-	id        uuid.UUID
-	date      time.Time
-	duration  time.Duration
-	professor *Professor
-	student   *Student
-	createdAt time.Time
+	id            uuid.UUID
+	dateTimeRange shared_domain_time.DateTimeRange
+	professor     *Professor
+	student       *Student
+	createdAt     time.Time
 }
 
 type BookingSnapshot struct {
-	Id        uuid.UUID
-	Date      time.Time
-	Duration  time.Duration
-	Professor *Professor
-	Student   *Student
-	CreatedAt time.Time
+	Id            uuid.UUID
+	DateTimeRange shared_domain_time.DateTimeRangeSnapshot
+	Professor     *Professor
+	Student       *Student
+	CreatedAt     time.Time
 }
 
-func NewBooking(id uuid.UUID, date time.Time, duration time.Duration, professor *Professor, student *Student, createdAt time.Time) Booking {
+func NewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor *Professor, student *Student, createdAt time.Time) Booking {
 	return Booking{
-		id:        id,
-		date:      date,
-		duration:  duration,
-		professor: professor,
-		student:   student,
-		createdAt: createdAt,
+		id:            id,
+		dateTimeRange: dateTimeRange,
+		professor:     professor,
+		student:       student,
+		createdAt:     createdAt,
 	}
 }
 
-func (b *Booking) GetEndDate() time.Time {
-	return b.date.Add(b.duration)
+func (b *Booking) EndDate() time.Time {
+	return b.dateTimeRange.EndDate()
 }
 
-func (b *Booking) GetStartDate() time.Time {
-	return b.date
+func (b *Booking) StartDate() time.Time {
+	return b.dateTimeRange.StartDate()
+}
+
+func (b *Booking) DateTimeRange() shared_domain_time.DateTimeRange {
+	return b.dateTimeRange
 }
 
 func (b *Booking) ToSnapshot() *BookingSnapshot {
 	return &BookingSnapshot{
-		Id:        b.id,
-		Date:      b.date,
-		Duration:  b.duration,
-		Professor: b.professor,
-		Student:   b.student,
-		CreatedAt: b.createdAt,
+		Id:            b.id,
+		DateTimeRange: b.dateTimeRange.ToSnapshot(),
+		Professor:     b.professor,
+		Student:       b.student,
+		CreatedAt:     b.createdAt,
 	}
 }

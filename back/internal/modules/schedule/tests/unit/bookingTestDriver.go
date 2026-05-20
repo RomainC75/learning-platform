@@ -40,18 +40,10 @@ func (td *BookingTestDriver) CreateBookingsForProfessor(rezas []schedule_domain.
 	return td
 }
 
-// func (td *BookingTestDriver) CreateBookingsForStudent(rezas ...schedule_domain.Booking) *BookingTestDriver {
-// 	td.student.ResetBooking()
-// 	for _, reza := range rezas {
-// 		td.student.MustAddBooking(reza)
-// 	}
-// 	return td
-// }
-
 func (td *BookingTestDriver) NewScheduleService() *schedule_application.BookingSrv {
 	professors := schedule_infra.NewInMemProfRepo(td.professor, false)
 	students := schedule_infra.NewInMemStudentRepo(td.student, false)
-	timeGenerator := shared_infra.NewDeterministicTimeGenerator(nowjuly1)
+	timeGenerator := shared_infra.NewDeterministicTimeGenerator(nowMarch1)
 	td.bookingSrv = schedule_application.NewBookingSrv(td.uuidGenerator, timeGenerator, professors, students, td.bookings)
 	return td.bookingSrv
 }

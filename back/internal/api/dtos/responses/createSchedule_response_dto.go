@@ -21,8 +21,8 @@ func ToCreateScheduleResponse(
 			Day: wa.Day,
 			TimeRange: dtos.TimeRangeDTO{
 				LocalTimeStart: dtos.LocalTimeDTO{
-					Hour:   wa.TimeRange.LocalTimeStart.ToSnapshot().Hour,
-					Minute: wa.TimeRange.LocalTimeStart.ToSnapshot().Minute,
+					Hour:   wa.TimeRange.LocalTimeStart.Hour,
+					Minute: wa.TimeRange.LocalTimeStart.Minute,
 				},
 				Duration: wa.TimeRange.Duration,
 			},
