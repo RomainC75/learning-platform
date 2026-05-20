@@ -48,11 +48,9 @@ func (dtr DateTimeRange) EndInMinutesAfter00h() int {
 func (tdr DateTimeRange) IsOverlapWith(other DateTimeRange) bool {
 	otherEnd := other.start.Add(other.duration)
 
-	fmt.Println("base : ", tdr.ToSnapshot())
-	fmt.Println("other - booked : ", other.ToSnapshot())
-	fmt.Println("res : ", (tdr.startsAfterOrEqual(other.start) && tdr.startsBeforeOrEqual(otherEnd)) || tdr.endsAfterOrEqual(other.start) && tdr.endsBeforeOrEqual(otherEnd))
-
-	return tdr.starsTogether(other) || (tdr.startsAfterOrEqual(other.start) && tdr.startsBeforeOrEqual(otherEnd)) || tdr.endsAfterOrEqual(other.start) && tdr.endsBeforeOrEqual(otherEnd)
+	tdrStartsDuringOther := tdr.startsAfterOrEqual(other.start) && tdr.startsBeforeOrEqual(otherEnd)
+	tdrEndsDuringOther := tdr.endsAfterOrEqual(other.start) && tdr.endsBeforeOrEqual(otherEnd)
+	return tdr.starsTogether(other) || tdrStartsDuringOther || tdrEndsDuringOther
 }
 
 func (tdr DateTimeRange) starsTogether(otherDateTime DateTimeRange) bool {

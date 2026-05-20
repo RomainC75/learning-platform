@@ -16,6 +16,10 @@ func NewAvailabilityException(dateTimeRange shared_domain_time.DateTimeRange) Av
 	}
 }
 
+func (ae AvailabilityException) IsOverlapping(booking Booking) bool {
+	return booking.dateTimeRange.IsOverlapWith(ae.dateTimeRange)
+}
+
 func (ae AvailabilityException) ToSnapshot() AvailabilityExceptionSnapshot {
 	return AvailabilityExceptionSnapshot{
 		DateTimeRange: ae.dateTimeRange.ToSnapshot(),
