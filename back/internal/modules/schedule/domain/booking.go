@@ -54,3 +54,12 @@ func (b *Booking) ToSnapshot() *BookingSnapshot {
 		CreatedAt:     b.createdAt,
 	}
 }
+
+func isBookingAlreadyExists(bookingList []Booking, newBooking Booking) bool {
+	for _, booking := range bookingList {
+		if booking.dateTimeRange.IsOverlapWith(newBooking.dateTimeRange) {
+			return true
+		}
+	}
+	return false
+}

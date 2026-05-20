@@ -2,6 +2,7 @@ package schedule_domain
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -10,6 +11,7 @@ var (
 	ErrProfessorNotSchedulable             = "professor not schedulable"
 	ErrNotMatchWithWeeklyAvailabilities    = "no match with weekly availabilities"
 	ErrNotRespectingAvailabilityExceptions = "not respecting availability exceptions"
+	ErrBookingAlreadyExists                = "booking already exists"
 )
 
 type Professor struct {
@@ -42,8 +44,14 @@ func (p *Professor) IsBookable(bookingList []Booking, newBooking Booking) error 
 		return errors.New(ErrNotMatchWithWeeklyAvailabilities)
 	} else if p.schedule.IsNotRespectingAvailabilityExceptions(newBooking) {
 		return errors.New(ErrNotRespectingAvailabilityExceptions)
+	} else if isBookingAlreadyExists(bookingList, newBooking) {
+		return errors.New(ErrBookingAlreadyExists)
 	}
-
+	fmt.Println("===============> NNNOOO ERROR ")
+	for _, b := range bookingList {
+		fmt.Println("===============> BOOKING IN LIST", b.ToSnapshot())
+	}
+	fmt.Println("======================================> NEW BOOKIN", newBooking.ToSnapshot())
 	return nil
 
 }

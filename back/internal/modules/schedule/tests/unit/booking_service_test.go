@@ -22,7 +22,7 @@ type CreateBookingCase struct {
 var (
 	controlBooking = schedule_domain.NewBooking(
 		booked1Uuid,
-		shared_domain_time.NewDateTimeRange(date_2026_may_20_12h00, duration1h),
+		shared_domain_time.NewDateTimeRange(date_2026_may_19_14h00, duration1h),
 		professor,
 		student,
 		nowMarch1,
@@ -61,6 +61,23 @@ var (
 			},
 			IsError:      true,
 			ErrorMessage: schedule_domain.ErrNotRespectingAvailabilityExceptions,
+		},
+		{
+			Info: "should not create booking, cause booking already exists",
+			CreateBookingRequest: dtos.CreateBookingRequest{
+				ProfessorId: professorUuid,
+				Date:        date_2026_may_12_14h00,
+				Duration:    duration1h,
+			},
+			ExpectedResponse: schedule_application.CreateBookingResponse{
+				Status:      true,
+				StudentId:   studentUuid,
+				ProfessorId: professorUuid,
+				Date:        date_2026_may_12_14h00,
+				Duration:    duration1h,
+			},
+			IsError:      true,
+			ErrorMessage: schedule_domain.ErrBookingAlreadyExists,
 		},
 	}
 )

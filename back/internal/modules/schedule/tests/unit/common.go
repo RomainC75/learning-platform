@@ -58,7 +58,7 @@ var (
 		),
 		schedule_domain.NewBooking(
 			booked2Uuid,
-			shared_domain_time.NewDateTimeRange(date_2026_may_12_12h00, duration1h),
+			shared_domain_time.NewDateTimeRange(date_2026_may_12_14h00, duration1h),
 			professor,
 			student,
 			nowMarch1,
@@ -70,8 +70,9 @@ var (
 
 var (
 	date_2026_may_20_12h00 = time.Date(2026, time.May, 20, 12, 0, 0, 0, time.UTC)
+	date_2026_may_19_14h00 = time.Date(2026, time.May, 19, 14, 0, 0, 0, time.UTC)
 	date_2026_may_11_12h00 = time.Date(2026, time.May, 11, 12, 0, 0, 0, time.UTC)
-	date_2026_may_12_12h00 = time.Date(2026, time.May, 12, 12, 0, 0, 0, time.UTC)
+	date_2026_may_12_14h00 = time.Date(2026, time.May, 12, 14, 0, 0, 0, time.UTC)
 	date_2026_july_6_12h00 = time.Date(2026, time.July, 6, 12, 0, 0, 0, time.UTC)
 	studentDate1           = time.Date(2026, time.May, 9, 12, 0, 0, 0, time.UTC)
 	studentDate2           = time.Date(2026, time.May, 9, 10, 30, 0, 0, time.UTC)
