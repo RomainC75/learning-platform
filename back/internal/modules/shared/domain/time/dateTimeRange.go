@@ -1,6 +1,9 @@
 package shared_domain_time
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type DateTimeRange struct {
 	start    time.Time
@@ -24,4 +27,53 @@ func (dtr DateTimeRange) ToSnapshot() DateTimeRangeSnapshot {
 		Start:    dtr.start,
 		Duration: dtr.duration,
 	}
+}
+
+func (dtr DateTimeRange) EndDate() time.Time {
+	return dtr.start.Add(dtr.duration)
+}
+
+func (dtr DateTimeRange) StartDate() time.Time {
+	return dtr.start
+}
+
+func (dtr DateTimeRange) StartInMinutesAfter00h() int {
+	return dtr.start.Hour()*60 + dtr.start.Minute()
+}
+
+func (dtr DateTimeRange) EndInMinutesAfter00h() int {
+	return dtr.start.Add(dtr.duration).Hour()*60 + dtr.start.Add(dtr.duration).Minute()
+}
+
+func (tdr DateTimeRange) IsOverlapWith(other DateTimeRange) bool {
+	otherEnd := other.start.Add(other.duration)
+
+	fmt.Println("base : ", tdr.ToSnapshot())
+	fmt.Println("other - booked : ", other.ToSnapshot())
+	fmt.Println("res : ", (tdr.startsAfterOrEqual(other.start) && tdr.startsBeforeOrEqual(otherEnd)) || tdr.endsAfterOrEqual(other.start) && tdr.endsBeforeOrEqual(otherEnd))
+
+	return tdr.starsTogether(other) || (tdr.startsAfterOrEqual(other.start) && tdr.startsBeforeOrEqual(otherEnd)) || tdr.endsAfterOrEqual(other.start) && tdr.endsBeforeOrEqual(otherEnd)
+}
+
+func (tdr DateTimeRange) starsTogether(otherDateTime DateTimeRange) bool {
+	return tdr.start.Equal(otherDateTime.start)
+}
+
+func (tdr DateTimeRange) startsBeforeOrEqual(otherTime time.Time) bool {
+	fmt.Println("=====> startsBeforeOrEqual", tdr.start, otherTime, tdr.start.Compare(otherTime) <= 0)
+	return tdr.start.Compare(otherTime) < 0
+}
+
+func (tdr DateTimeRange) startsAfterOrEqual(otherTime time.Time) bool {
+	return tdr.start.Compare(otherTime) > 0
+}
+
+func (tdr DateTimeRange) endsBeforeOrEqual(otherTime time.Time) bool {
+	tdrEnd := tdr.start.Add(tdr.duration)
+	return tdrEnd.Compare(otherTime) < 0
+}
+
+func (tdr DateTimeRange) endsAfterOrEqual(otherTime time.Time) bool {
+	tdrEnd := tdr.start.Add(tdr.duration)
+	return tdrEnd.Compare(otherTime) > 0
 }
