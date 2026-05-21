@@ -2,7 +2,6 @@ package schedule_domain
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -47,11 +46,5 @@ func (p *Professor) IsBookable(bookingList []Booking, newBooking Booking) error 
 	} else if isBookingAlreadyExists(bookingList, newBooking) {
 		return errors.New(ErrBookingAlreadyExists)
 	}
-	fmt.Println("===============> NNNOOO ERROR ")
-	for _, b := range bookingList {
-		fmt.Println("===============> BOOKING IN LIST", b.ToSnapshot())
-	}
-	fmt.Println("======================================> NEW BOOKIN", newBooking.ToSnapshot())
 	return nil
-
 }

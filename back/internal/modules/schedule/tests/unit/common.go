@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	professorUuid = uuid.MustParse("22ce4a72-2978-4f19-9181-e59963add95b")
-	studentUuid   = uuid.MustParse("3d30a9c8-5768-4d73-ab5d-8d36cab7f03f")
-	bookingUuid   = uuid.MustParse("76d0f1d9-a7fe-4783-bd81-b51fc409aab9")
-	booked1Uuid   = uuid.MustParse("c0a6543f-41f9-4e8d-8502-24571b1b477c")
-	booked2Uuid   = uuid.MustParse("0aef3256-8475-4b91-b675-ce072516c701")
+	professorUuid  = uuid.MustParse("22ce4a72-2978-4f19-9181-e59963add95b")
+	studentUuid    = uuid.MustParse("3d30a9c8-5768-4d73-ab5d-8d36cab7f03f")
+	newBookingUuid = uuid.MustParse("76d0f1d9-a7fe-4783-bd81-b51fc409aab9")
+	booked1Uuid    = uuid.MustParse("c0a6543f-41f9-4e8d-8502-24571b1b477c")
+	booked2Uuid    = uuid.MustParse("0aef3256-8475-4b91-b675-ce072516c701")
 	// wa
 	// : monday 10-14
 	// : thursday 14-18
@@ -68,6 +68,7 @@ var (
 )
 
 var (
+	date_2026_may_25_12h00 = time.Date(2026, time.May, 25, 12, 0, 0, 0, time.UTC)
 	date_2026_may_20_12h00 = time.Date(2026, time.May, 20, 12, 0, 0, 0, time.UTC)
 	date_2026_may_19_14h00 = time.Date(2026, time.May, 19, 14, 0, 0, 0, time.UTC)
 	date_2026_may_11_12h00 = time.Date(2026, time.May, 11, 12, 0, 0, 0, time.UTC)

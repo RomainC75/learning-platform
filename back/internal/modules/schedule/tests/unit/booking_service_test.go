@@ -1,11 +1,11 @@
 package schedule_unit
 
 import (
-	"fmt"
 	dtos "language-learning/internal/api/dtos/request"
 	schedule_application "language-learning/internal/modules/schedule/application"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
 	shared_domain_time "language-learning/internal/modules/shared/domain/time"
+	utils_display "language-learning/utils/display"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,8 +21,8 @@ type CreateBookingCase struct {
 
 var (
 	controlBooking = schedule_domain.NewBooking(
-		booked1Uuid,
-		shared_domain_time.NewDateTimeRange(date_2026_may_19_14h00, duration1h),
+		newBookingUuid,
+		shared_domain_time.NewDateTimeRange(date_2026_may_25_12h00, duration1h),
 		professor,
 		student,
 		nowMarch1,
@@ -79,6 +79,23 @@ var (
 			IsError:      true,
 			ErrorMessage: schedule_domain.ErrBookingAlreadyExists,
 		},
+		{
+			Info: "should create booking and save it",
+			CreateBookingRequest: dtos.CreateBookingRequest{
+				ProfessorId: professorUuid,
+				Date:        date_2026_may_25_12h00,
+				Duration:    duration1h,
+			},
+			ExpectedResponse: schedule_application.CreateBookingResponse{
+				Status:      true,
+				StudentId:   studentUuid,
+				ProfessorId: professorUuid,
+				Date:        date_2026_may_25_12h00,
+				Duration:    duration1h,
+			},
+			IsError: false,
+		},
+		// cannot create booking in the past
 	}
 )
 
@@ -91,22 +108,24 @@ func TestCreateBooking(t *testing.T) {
 
 			studentContext := td.BuildStudentContext()
 			res, err := td.CreateBooking(studentContext, cs.CreateBookingRequest)
-			fmt.Println("====> res : ", res)
 			if cs.IsError {
-				fmt.Println("======= ERR : ", err.Error())
 				assert.NotNil(t, err, cs.ErrorMessage)
 				assert.EqualError(t, err, cs.ErrorMessage)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, cs.ExpectedResponse, res)
 
-				controlBookings := make([]schedule_domain.Booking, len(bookedList)+1)
+				controlBookings := make([]schedule_domain.Booking, 0, len(bookedList)+1)
 				controlBookings = append(controlBookings, bookedList...)
 				controlBookings = append(controlBookings, controlBooking)
 
+				assert.Equal(t, len(controlBookings), len(td.SavedBookings()))
 				for i := range controlBookings {
+					utils_display.PrettyDisplay("control : ", controlBookings[i].ToSnapshot())
+					utils_display.PrettyDisplay("savedBooking : ", td.SavedBookings()[i].ToSnapshot())
 					assert.Equal(t, controlBookings[i].ToSnapshot(), td.SavedBookings()[i].ToSnapshot())
 				}
+
 			}
 		})
 	}

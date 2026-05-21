@@ -19,7 +19,7 @@ type BookingTestDriver struct {
 }
 
 func NewBookingTestDriver() *BookingTestDriver {
-	uuidGenerator := shared_infra.NewInMemUuidGenerator(bookingUuid)
+	uuidGenerator := shared_infra.NewInMemUuidGenerator(newBookingUuid)
 
 	bookings := schedule_infra.NewInMemBookingRepo()
 
