@@ -1,7 +1,6 @@
 package shared_domain_time
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -48,7 +47,7 @@ func (dtr DateTimeRange) EndInMinutesAfter00h() int {
 func (tdr DateTimeRange) IsOverlapWith(other DateTimeRange) bool {
 	otherEnd := other.start.Add(other.duration)
 
-	tdrStartsDuringOther := tdr.startsAfterOrEqual(other.start) && tdr.startsBeforeOrEqual(otherEnd)
+	tdrStartsDuringOther := tdr.startsAfterOrEqual(other.start) && tdr.StartsBeforeOrEqual(otherEnd)
 	tdrEndsDuringOther := tdr.endsAfterOrEqual(other.start) && tdr.endsBeforeOrEqual(otherEnd)
 	return tdr.starsTogether(other) || tdrStartsDuringOther || tdrEndsDuringOther
 }
@@ -57,8 +56,7 @@ func (tdr DateTimeRange) starsTogether(otherDateTime DateTimeRange) bool {
 	return tdr.start.Equal(otherDateTime.start)
 }
 
-func (tdr DateTimeRange) startsBeforeOrEqual(otherTime time.Time) bool {
-	fmt.Println("=====> startsBeforeOrEqual", tdr.start, otherTime, tdr.start.Compare(otherTime) <= 0)
+func (tdr DateTimeRange) StartsBeforeOrEqual(otherTime time.Time) bool {
 	return tdr.start.Compare(otherTime) < 0
 }
 

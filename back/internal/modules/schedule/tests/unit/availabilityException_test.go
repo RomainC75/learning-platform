@@ -19,7 +19,7 @@ type AETestCase struct {
 }
 
 var (
-	aeControlBooking = schedule_domain.NewBooking(
+	aeControlBooking = schedule_domain.MustNewBooking(
 		booked1Uuid,
 		shared_domain_time.NewDateTimeRange(date_2026_july_6_12h00, duration1h),
 		professor,

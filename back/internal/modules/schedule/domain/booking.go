@@ -1,10 +1,15 @@
 package schedule_domain
 
 import (
+	"errors"
 	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 	"time"
 
 	"github.com/google/uuid"
+)
+
+var (
+	ErrBookingInPast = "error : cannot create booking in the past"
 )
 
 type Booking struct {
@@ -23,14 +28,25 @@ type BookingSnapshot struct {
 	CreatedAt     time.Time
 }
 
-func NewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor *Professor, student *Student, createdAt time.Time) Booking {
+func NewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor *Professor, student *Student, createdAt time.Time) (Booking, error) {
+	if dateTimeRange.StartsBeforeOrEqual(createdAt) {
+		return Booking{}, errors.New(ErrBookingInPast)
+	}
 	return Booking{
 		id:            id,
 		dateTimeRange: dateTimeRange,
 		professor:     professor,
 		student:       student,
 		createdAt:     createdAt,
+	}, nil
+}
+
+func MustNewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor *Professor, student *Student, createdAt time.Time) Booking {
+	newBooking, err := NewBooking(id, dateTimeRange, professor, student, createdAt)
+	if err != nil {
+		panic(err)
 	}
+	return newBooking
 }
 
 func (b *Booking) EndDate() time.Time {

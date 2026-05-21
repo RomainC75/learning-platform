@@ -20,7 +20,7 @@ type CreateBookingCase struct {
 }
 
 var (
-	controlBooking = schedule_domain.NewBooking(
+	controlBooking = schedule_domain.MustNewBooking(
 		newBookingUuid,
 		shared_domain_time.NewDateTimeRange(date_2026_may_25_12h00, duration1h),
 		professor,
@@ -95,7 +95,23 @@ var (
 			},
 			IsError: false,
 		},
-		// cannot create booking in the past
+		{
+			Info: "should not create booking in the past",
+			CreateBookingRequest: dtos.CreateBookingRequest{
+				ProfessorId: professorUuid,
+				Date:        date_2026_feb_1_12h00,
+				Duration:    duration1h,
+			},
+			ExpectedResponse: schedule_application.CreateBookingResponse{
+				Status:      true,
+				StudentId:   studentUuid,
+				ProfessorId: professorUuid,
+				Date:        date_2026_feb_1_12h00,
+				Duration:    duration1h,
+			},
+			IsError:      true,
+			ErrorMessage: schedule_domain.ErrNotBookable,
+		},
 	}
 )
 

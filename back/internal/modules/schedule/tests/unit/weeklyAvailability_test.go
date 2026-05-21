@@ -20,7 +20,7 @@ type WETestCase struct {
 	Expected              bool
 }
 
-var waControlBooking = schedule_domain.NewBooking(
+var waControlBooking = schedule_domain.MustNewBooking(
 	booked1Uuid,
 	shared_domain_time.NewDateTimeRange(date_2026_may_11_12h00, duration1h),
 	professor,

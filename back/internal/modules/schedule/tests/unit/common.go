@@ -48,14 +48,14 @@ var (
 		),
 	}
 	bookedList = []schedule_domain.Booking{
-		schedule_domain.NewBooking(
+		schedule_domain.MustNewBooking(
 			booked1Uuid,
 			shared_domain_time.NewDateTimeRange(date_2026_may_11_12h00, duration1h),
 			professor,
 			student,
 			nowMarch1,
 		),
-		schedule_domain.NewBooking(
+		schedule_domain.MustNewBooking(
 			booked2Uuid,
 			shared_domain_time.NewDateTimeRange(date_2026_may_12_14h00, duration1h),
 			professor,
@@ -74,6 +74,7 @@ var (
 	date_2026_may_11_12h00 = time.Date(2026, time.May, 11, 12, 0, 0, 0, time.UTC)
 	date_2026_may_12_14h00 = time.Date(2026, time.May, 12, 14, 0, 0, 0, time.UTC)
 	date_2026_july_6_12h00 = time.Date(2026, time.July, 6, 12, 0, 0, 0, time.UTC)
+	date_2026_feb_1_12h00  = time.Date(2026, time.February, 1, 12, 0, 0, 0, time.UTC)
 	july25                 = time.Date(2026, time.July, 25, 12, 0, 0, 0, time.UTC)
 	july1                  = time.Date(2026, time.July, 1, 0, 0, 0, 0, time.UTC)
 	nowMarch1              = time.Date(2026, time.March, 1, 12, 0, 0, 0, time.UTC)

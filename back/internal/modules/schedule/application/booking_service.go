@@ -52,7 +52,10 @@ func (bookingSrv *BookingSrv) CreateBooking(ctx context.Context, createBookingRe
 
 	newBookingUuid := bookingSrv.idGenerator.Generate()
 	dtr := shared_domain_time.NewDateTimeRange(createBookingRequest.Date, createBookingRequest.Duration)
-	newBooking := schedule_domain.NewBooking(newBookingUuid, dtr, foundProfessor, student, bookingSrv.timeGenerator.Now())
+	newBooking, err := schedule_domain.NewBooking(newBookingUuid, dtr, foundProfessor, student, bookingSrv.timeGenerator.Now())
+	if err != nil {
+		return CreateBookingResponse{}, err
+	}
 
 	bookings := bookingSrv.bookings.GetBookings(foundProfessor)
 	err = foundProfessor.IsBookable(bookings, newBooking)
