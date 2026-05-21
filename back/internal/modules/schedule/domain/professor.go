@@ -48,3 +48,21 @@ func (p *Professor) IsBookable(bookingList []Booking, newBooking Booking) error 
 	}
 	return nil
 }
+
+// == Snapshot ==
+
+type ProfessorSnapshot struct {
+	Id        uuid.UUID
+	FirstName string
+	LastName  string
+	Schedule  ScheduleSnapshot
+}
+
+func (p Professor) ToSnapshot() ProfessorSnapshot {
+	return ProfessorSnapshot{
+		Id:        p.id,
+		FirstName: p.firstName,
+		LastName:  p.lastName,
+		Schedule:  p.schedule.ToSnapshot(),
+	}
+}

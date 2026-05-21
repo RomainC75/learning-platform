@@ -20,14 +20,6 @@ type Booking struct {
 	createdAt     time.Time
 }
 
-type BookingSnapshot struct {
-	Id            uuid.UUID
-	DateTimeRange shared_domain_time.DateTimeRangeSnapshot
-	Professor     *Professor
-	Student       *Student
-	CreatedAt     time.Time
-}
-
 func NewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor *Professor, student *Student, createdAt time.Time) (Booking, error) {
 	if dateTimeRange.StartsBeforeOrEqual(createdAt) {
 		return Booking{}, errors.New(ErrBookingInPast)
@@ -61,6 +53,25 @@ func (b *Booking) DateTimeRange() shared_domain_time.DateTimeRange {
 	return b.dateTimeRange
 }
 
+func isBookingAlreadyExists(bookingList []Booking, newBooking Booking) bool {
+	for _, booking := range bookingList {
+		if booking.dateTimeRange.IsOverlapWith(newBooking.dateTimeRange) {
+			return true
+		}
+	}
+	return false
+}
+
+// == Snapshot ==
+
+type BookingSnapshot struct {
+	Id            uuid.UUID
+	DateTimeRange shared_domain_time.DateTimeRangeSnapshot
+	Professor     *Professor
+	Student       *Student
+	CreatedAt     time.Time
+}
+
 func (b *Booking) ToSnapshot() *BookingSnapshot {
 	return &BookingSnapshot{
 		Id:            b.id,
@@ -69,13 +80,4 @@ func (b *Booking) ToSnapshot() *BookingSnapshot {
 		Student:       b.student,
 		CreatedAt:     b.createdAt,
 	}
-}
-
-func isBookingAlreadyExists(bookingList []Booking, newBooking Booking) bool {
-	for _, booking := range bookingList {
-		if booking.dateTimeRange.IsOverlapWith(newBooking.dateTimeRange) {
-			return true
-		}
-	}
-	return false
 }

@@ -110,7 +110,7 @@ var (
 				Duration:    duration1h,
 			},
 			IsError:      true,
-			ErrorMessage: schedule_domain.ErrNotBookable,
+			ErrorMessage: schedule_domain.ErrBookingInPast,
 		},
 	}
 )

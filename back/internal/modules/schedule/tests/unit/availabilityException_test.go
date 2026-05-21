@@ -1,7 +1,6 @@
 package schedule_unit
 
 import (
-	"fmt"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
 	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 	"testing"
@@ -69,9 +68,6 @@ var (
 func TestAvailabilityException(t *testing.T) {
 	for _, tc := range aeTestCases {
 		t.Run(tc.Message, func(t *testing.T) {
-			fmt.Println("====> ends : ", july1.Add(tc.Duration).UTC())
-			fmt.Println("  ")
-
 			dtr := shared_domain_time.NewDateTimeRange(tc.Date, tc.Duration)
 
 			ae := schedule_domain.NewAvailabilityException(dtr)

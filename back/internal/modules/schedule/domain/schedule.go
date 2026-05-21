@@ -1,8 +1,6 @@
 package schedule_domain
 
 import (
-	"fmt"
-	utils_display "language-learning/utils/display"
 	"slices"
 )
 
@@ -28,11 +26,6 @@ func (s Schedule) AvailabilityExceptions() []AvailabilityException {
 
 func (s Schedule) IsAMatchWithWeeklyAvailabilities(newBooking Booking) bool {
 	for _, wa := range s.weeklyAvailabilities {
-		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		fmt.Println("booking day ", newBooking.DateTimeRange().StartDate().Weekday())
-		utils_display.PrettyDisplay("newBooking", newBooking.ToSnapshot())
-		utils_display.PrettyDisplay("newBooking", newBooking.ToSnapshot())
-		utils_display.PrettyDisplay("wa", wa.ToSnapshot())
 		if wa.IsMatchWith(newBooking) {
 			return true
 		}
@@ -47,6 +40,13 @@ func (s Schedule) IsNotRespectingAvailabilityExceptions(booking Booking) bool {
 		}
 	}
 	return false
+}
+
+// == Snapshot ==
+
+type ScheduleSnapshot struct {
+	WeeklyAvailabilities   []WeeklyAvailabilitySnapshot
+	AvailabilityExceptions []AvailabilityExceptionSnapshot
 }
 
 func (s Schedule) ToSnapshot() ScheduleSnapshot {
@@ -64,9 +64,4 @@ func (s Schedule) ToSnapshot() ScheduleSnapshot {
 		WeeklyAvailabilities:   weeklyAvailabilities,
 		AvailabilityExceptions: availabilityExceptions,
 	}
-}
-
-type ScheduleSnapshot struct {
-	WeeklyAvailabilities   []WeeklyAvailabilitySnapshot
-	AvailabilityExceptions []AvailabilityExceptionSnapshot
 }

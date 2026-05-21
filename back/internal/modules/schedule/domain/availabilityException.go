@@ -6,10 +6,6 @@ type AvailabilityException struct {
 	dateTimeRange shared_domain_time.DateTimeRange
 }
 
-type AvailabilityExceptionSnapshot struct {
-	DateTimeRange shared_domain_time.DateTimeRangeSnapshot
-}
-
 func NewAvailabilityException(dateTimeRange shared_domain_time.DateTimeRange) AvailabilityException {
 	return AvailabilityException{
 		dateTimeRange: dateTimeRange,
@@ -20,8 +16,14 @@ func (ae AvailabilityException) IsOverlapping(booking Booking) bool {
 	return booking.dateTimeRange.IsOverlapWith(ae.dateTimeRange)
 }
 
+// == Snapshot ==
+
 func (ae AvailabilityException) ToSnapshot() AvailabilityExceptionSnapshot {
 	return AvailabilityExceptionSnapshot{
 		DateTimeRange: ae.dateTimeRange.ToSnapshot(),
 	}
+}
+
+type AvailabilityExceptionSnapshot struct {
+	DateTimeRange shared_domain_time.DateTimeRangeSnapshot
 }

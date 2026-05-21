@@ -18,10 +18,18 @@ func NewStudent(id uuid.UUID, firstName string, lastName string) *Student {
 	}
 }
 
-// func (student *Student) MustAddBooking(newReza Booking) {
-// 	student.Bookings = append(student.Bookings, newReza)
-// }
+// == Snapshot ==
 
-// func (student *Student) ResetBooking() {
-// 	student.Bookings = []Booking{}
-// }
+type StudentSnapshot struct {
+	Id        uuid.UUID
+	FirstName string
+	LastName  string
+}
+
+func (s Student) ToSnapshot() StudentSnapshot {
+	return StudentSnapshot{
+		Id:        s.id,
+		FirstName: s.firstName,
+		LastName:  s.lastName,
+	}
+}
