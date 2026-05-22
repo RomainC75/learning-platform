@@ -44,15 +44,15 @@ func (bookingSrv *BookingSrv) CreateBooking(ctx context.Context, createBookingRe
 		return CreateBookingResponse{}, err
 	}
 
-	studentId, _ := ctx.Value(auth_jwt.UserId).(uuid.UUID)
-	student, err := bookingSrv.students.Get(studentId)
+	studentuuid, _ := ctx.Value(auth_jwt.UserId).(uuid.UUID)
+	studentId, err := bookingSrv.students.Get(studentuuid)
 	if err != nil {
 		return CreateBookingResponse{}, err
 	}
 
 	newBookingUuid := bookingSrv.idGenerator.Generate()
 	dtr := shared_domain_time.NewDateTimeRange(createBookingRequest.Date, createBookingRequest.Duration)
-	newBooking, err := schedule_domain.NewBooking(newBookingUuid, dtr, foundProfessor, student, bookingSrv.timeGenerator.Now())
+	newBooking, err := schedule_domain.NewBooking(newBookingUuid, dtr, foundProfessor.Id(), studentId, bookingSrv.timeGenerator.Now())
 	if err != nil {
 		return CreateBookingResponse{}, err
 	}
@@ -70,8 +70,8 @@ func (bookingSrv *BookingSrv) CreateBooking(ctx context.Context, createBookingRe
 
 	return CreateBookingResponse{
 		Status:      true,
-		StudentId:   studentId,
-		ProfessorId: foundProfessor.Id(),
+		StudentId:   uuid.UUID(studentId),
+		ProfessorId: uuid.UUID(foundProfessor.Id()),
 		Date:        createBookingRequest.Date,
 		Duration:    createBookingRequest.Duration,
 	}, nil

@@ -13,19 +13,17 @@ var (
 	ErrBookingAlreadyExists                = "booking already exists"
 )
 
+type ProfessorId uuid.UUID
+
 type Professor struct {
-	id        uuid.UUID
-	firstName string
-	lastName  string
-	schedule  Schedule
+	id       ProfessorId
+	schedule Schedule
 }
 
-func NewProfessor(id uuid.UUID, firstName string, lastName string, schedule Schedule) *Professor {
+func NewProfessor(userId uuid.UUID, schedule Schedule) *Professor {
 	return &Professor{
-		id:        id,
-		firstName: firstName,
-		lastName:  lastName,
-		schedule:  schedule,
+		id:       ProfessorId(userId),
+		schedule: schedule,
 	}
 }
 
@@ -33,7 +31,7 @@ func (p *Professor) SetSchedule(schedule Schedule) {
 	p.schedule = schedule
 }
 
-func (p *Professor) Id() uuid.UUID {
+func (p *Professor) Id() ProfessorId {
 	return p.id
 
 }
@@ -60,9 +58,7 @@ type ProfessorSnapshot struct {
 
 func (p Professor) ToSnapshot() ProfessorSnapshot {
 	return ProfessorSnapshot{
-		Id:        p.id,
-		FirstName: p.firstName,
-		LastName:  p.lastName,
-		Schedule:  p.schedule.ToSnapshot(),
+		Id:       uuid.UUID(p.id),
+		Schedule: p.schedule.ToSnapshot(),
 	}
 }

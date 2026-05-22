@@ -21,7 +21,7 @@ type ScheduleTestDriver struct {
 }
 
 func NewScheduleTestDriver() *ScheduleTestDriver {
-	professor := schedule_domain.NewProfessor(professorUuid, "big", "brother", schedule_domain.NewSchedule(
+	professor := schedule_domain.NewProfessor(professorUuid, schedule_domain.NewSchedule(
 		[]schedule_domain.WeeklyAvailability{
 			schedule_domain.NewWeeklyAvailability(
 				time.Monday,

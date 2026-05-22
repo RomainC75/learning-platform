@@ -13,7 +13,7 @@ import (
 type BookingTestDriver struct {
 	uuidGenerator *shared_infra.InMemUuidGenerator
 	professor     *schedule_domain.Professor
-	student       *schedule_domain.Student
+	student       schedule_domain.StudentId
 	bookings      *schedule_infra.InMemBookingRepo
 	bookingSrv    *schedule_application.BookingSrv
 }

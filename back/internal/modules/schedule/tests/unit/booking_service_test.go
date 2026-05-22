@@ -23,7 +23,7 @@ var (
 	controlBooking = schedule_domain.MustNewBooking(
 		newBookingUuid,
 		shared_domain_time.NewDateTimeRange(date_2026_may_25_12h00, duration1h),
-		professor,
+		professor.Id(),
 		student,
 		nowMarch1,
 	)

@@ -15,12 +15,12 @@ var (
 type Booking struct {
 	id            uuid.UUID
 	dateTimeRange shared_domain_time.DateTimeRange
-	professor     *Professor
-	student       *Student
+	professor     ProfessorId
+	student       StudentId
 	createdAt     time.Time
 }
 
-func NewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor *Professor, student *Student, createdAt time.Time) (Booking, error) {
+func NewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor ProfessorId, student StudentId, createdAt time.Time) (Booking, error) {
 	if dateTimeRange.StartsBeforeOrEqual(createdAt) {
 		return Booking{}, errors.New(ErrBookingInPast)
 	}
@@ -33,7 +33,7 @@ func NewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, pr
 	}, nil
 }
 
-func MustNewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor *Professor, student *Student, createdAt time.Time) Booking {
+func MustNewBooking(id uuid.UUID, dateTimeRange shared_domain_time.DateTimeRange, professor ProfessorId, student StudentId, createdAt time.Time) Booking {
 	newBooking, err := NewBooking(id, dateTimeRange, professor, student, createdAt)
 	if err != nil {
 		panic(err)
@@ -67,8 +67,8 @@ func isBookingAlreadyExists(bookingList []Booking, newBooking Booking) bool {
 type BookingSnapshot struct {
 	Id            uuid.UUID
 	DateTimeRange shared_domain_time.DateTimeRangeSnapshot
-	Professor     *Professor
-	Student       *Student
+	Professor     ProfessorId
+	Student       StudentId
 	CreatedAt     time.Time
 }
 

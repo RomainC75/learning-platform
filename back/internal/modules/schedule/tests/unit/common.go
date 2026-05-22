@@ -51,20 +51,20 @@ var (
 		schedule_domain.MustNewBooking(
 			booked1Uuid,
 			shared_domain_time.NewDateTimeRange(date_2026_may_11_12h00, duration1h),
-			professor,
+			professor.Id(),
 			student,
 			nowMarch1,
 		),
 		schedule_domain.MustNewBooking(
 			booked2Uuid,
 			shared_domain_time.NewDateTimeRange(date_2026_may_12_14h00, duration1h),
-			professor,
+			professor.Id(),
 			student,
 			nowMarch1,
 		),
 	}
-	professor = schedule_domain.NewProfessor(professorUuid, "John", "Doe", schedule_domain.NewSchedule(weeklyAvalabilities, availabilityExceptions))
-	student   = schedule_domain.NewStudent(studentUuid, "Jane", "Smith")
+	professor = schedule_domain.NewProfessor(professorUuid, schedule_domain.NewSchedule(weeklyAvalabilities, availabilityExceptions))
+	student   = schedule_domain.StudentId(studentUuid)
 )
 
 var (
