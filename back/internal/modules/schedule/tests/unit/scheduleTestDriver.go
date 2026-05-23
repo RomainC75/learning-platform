@@ -67,3 +67,7 @@ func (td *ScheduleTestDriver) GetSavedSchedule() schedule_domain.Schedule {
 func (td *ScheduleTestDriver) CreateSchedule(createSchedule dtos_requests.CreateScheduleRequest) (dtos_responses.CreateScheduleResponse, error) {
 	return td.scheduleSrv.CreateSchedule(td.ctx, createSchedule)
 }
+
+func (td *ScheduleTestDriver) ResetSchedule() {
+	td.professor.SetSchedule(schedule_domain.Schedule{})
+}

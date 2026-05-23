@@ -17,6 +17,7 @@ type CreateAvailabilityScheduleCases struct {
 	Info                  string
 	CreateScheduleRequest dtos_requests.CreateScheduleRequest
 	ExpectedResponse      dtos_responses.CreateScheduleResponse
+	ShouldResetSchedule   bool
 	IsProfessorMissing    bool
 	IsError               bool
 	ErrorMessage          string
@@ -76,6 +77,12 @@ var testCases []CreateAvailabilityScheduleCases = []CreateAvailabilityScheduleCa
 		ExpectedResponse:      baseScheduleResponse,
 	},
 	{
+		Info:                  "professor should create schedule if there is no schedule",
+		CreateScheduleRequest: baseSchedule,
+		ShouldResetSchedule:   true,
+		ExpectedResponse:      baseScheduleResponse,
+	},
+	{
 		Info:                  "professor should not create schedule if professor is missing",
 		CreateScheduleRequest: baseSchedule,
 		ExpectedResponse:      dtos_responses.CreateScheduleResponse{},
@@ -91,6 +98,9 @@ func TestCreateSchedule(t *testing.T) {
 
 			testDriver := NewScheduleTestDriver()
 			testDriver.NewScheduleService(cs.IsProfessorMissing)
+			if cs.ShouldResetSchedule {
+				testDriver.ResetSchedule()
+			}
 			testDriver.SetSchedule(schedule_domain.Schedule{})
 			res, err := testDriver.CreateSchedule(cs.CreateScheduleRequest)
 
