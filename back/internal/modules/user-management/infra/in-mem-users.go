@@ -1,7 +1,6 @@
 package user_mngmt_infra
 
 import (
-	"errors"
 	user_mngmt_domain "language-learning/internal/modules/user-management/domain"
 
 	"github.com/google/uuid"
@@ -27,14 +26,14 @@ func (umu *InMemUsers) GetById(userId uuid.UUID) (*user_mngmt_domain.User, error
 
 func (umu *InMemUsers) GetByEmail(userEmail string) (*user_mngmt_domain.User, error) {
 	if umu.expectedGetError {
-		return nil, errors.New(user_mngmt_domain.ErrEmailAlreadyUsed)
+		return nil, user_mngmt_domain.ErrUserNotFound
 	}
 	return umu.expectedUser, nil
 }
 
 func (umu *InMemUsers) SaveUser(newUser *user_mngmt_domain.User, newEncryptedPass string) error {
 	if umu.expectedSaveUserError {
-		return errors.New(user_mngmt_domain.ErrTryingtoSaveTheNewUser)
+		return user_mngmt_domain.ErrTryingtoSaveTheNewUser
 	}
 	return nil
 }

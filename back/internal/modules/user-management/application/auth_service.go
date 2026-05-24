@@ -10,6 +10,10 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrWrongEmailOrPassword = errors.New("wrong email or password")
+)
+
 type SignupRequest struct {
 	Email       string `json:"email" required:"true"`
 	Password    string `json:"password" required:"true"`
@@ -21,6 +25,17 @@ type SignupRequest struct {
 type SignupResponse struct {
 	Id    uuid.UUID `json:"id"`
 	Email string    `json:"email"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email" required:"true"`
+	Password string `json:"password" required:"true"`
+}
+
+type LoginResponse struct {
+	Id    uuid.UUID `json:"id"`
+	Email string    `json:"email"`
+	Token string    `json:"token"`
 }
 
 type AuthService struct {
@@ -37,10 +52,18 @@ func NewAuthSrv(uuidGenerator shared_domain_uuid.UuidGenerator, timeGenerator sh
 	}
 }
 
+func (as *AuthService) Login(ctx context.Context, loginRequest LoginRequest) (LoginResponse, error) {
+	_, err := as.users.GetByEmail(loginRequest.Email)
+	if err != nil && errors.Is(err, user_mngmt_domain.ErrUserNotFound) {
+		return LoginResponse{}, ErrWrongEmailOrPassword
+	}
+	return LoginResponse{}, nil
+}
+
 func (as *AuthService) Signup(ctx context.Context, signupRequest SignupRequest) (SignupResponse, error) {
 	_, err := as.users.GetByEmail(signupRequest.Email)
-	if err != nil {
-		return SignupResponse{}, errors.New(user_mngmt_domain.ErrEmailAlreadyUsed)
+	if err == nil {
+		return SignupResponse{}, user_mngmt_domain.ErrEmailAlreadyUsed
 	}
 
 	newUuid := as.uuidGenerator.Generate()

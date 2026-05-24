@@ -15,20 +15,24 @@ import (
 
 var (
 	newUserUuid  = uuid.MustParse("3d30a9c8-5768-4d73-ab5d-8d36cab7f03f")
-	newUserEmail = "john_doe@email.com"
+	userEmail    = "john_doe@email.com"
+	userPassword = "123456789"
 	newUserReq   = user_mngmnt_application.SignupRequest{
-		Email:       newUserEmail,
-		Password:    "123456789",
+		Email:       userEmail,
+		Password:    userPassword,
 		FirstName:   "John",
 		LastName:    "Doe",
 		IsProfessor: false,
 	}
+	loginReq = user_mngmnt_application.LoginRequest{
+		Email:    userEmail,
+		Password: userPassword,
+	}
 	now = time.Date(2026, time.May, 1, 12, 0, 0, 0, time.UTC)
 )
 
-func TestAuthService(t *testing.T) {
-	t.Run("should not signup if email is already used", func(t *testing.T) {
-
+func TestAuthServiceLogin(t *testing.T) {
+	t.Run("should not Login if email is wrong", func(t *testing.T) {
 		users := user_mngmt_infra.NewInMemUsers(nil, true, false)
 		ctx := context.Background()
 
@@ -36,15 +40,15 @@ func TestAuthService(t *testing.T) {
 		uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
 		authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, users)
 
-		_, err := authSrv.Signup(ctx, newUserReq)
-
-		assert.EqualError(t, err, user_mngmt_domain.ErrEmailAlreadyUsed)
-
+		_, err := authSrv.Login(ctx, loginReq)
+		assert.EqualError(t, err, user_mngmnt_application.ErrWrongEmailOrPassword.Error())
 	})
+}
 
-	t.Run("should return error if new user could not be saved", func(t *testing.T) {
+func TestAuthServiceSignup(t *testing.T) {
+	t.Run("should not signup if email is already used", func(t *testing.T) {
 
-		users := user_mngmt_infra.NewInMemUsers(nil, false, true)
+		users := user_mngmt_infra.NewInMemUsers(nil, false, false)
 		ctx := context.Background()
 
 		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
@@ -53,12 +57,27 @@ func TestAuthService(t *testing.T) {
 
 		_, err := authSrv.Signup(ctx, newUserReq)
 
-		assert.EqualError(t, err, user_mngmt_domain.ErrTryingtoSaveTheNewUser)
+		assert.EqualError(t, err, user_mngmt_domain.ErrEmailAlreadyUsed.Error())
+
+	})
+
+	t.Run("should return error if new user could not be saved", func(t *testing.T) {
+
+		users := user_mngmt_infra.NewInMemUsers(nil, true, true)
+		ctx := context.Background()
+
+		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
+		uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
+		authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, users)
+
+		_, err := authSrv.Signup(ctx, newUserReq)
+
+		assert.EqualError(t, err, user_mngmt_domain.ErrTryingtoSaveTheNewUser.Error())
 
 	})
 	t.Run("should signup a new user", func(t *testing.T) {
 
-		users := user_mngmt_infra.NewInMemUsers(nil, false, false)
+		users := user_mngmt_infra.NewInMemUsers(nil, true, false)
 		ctx := context.Background()
 
 		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
@@ -71,7 +90,7 @@ func TestAuthService(t *testing.T) {
 
 		expectedRes := user_mngmnt_application.SignupResponse{
 			Id:    newUserUuid,
-			Email: newUserEmail,
+			Email: userEmail,
 		}
 		assert.Equal(t, expectedRes, res)
 	})

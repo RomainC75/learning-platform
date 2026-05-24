@@ -1,11 +1,16 @@
 package user_mngmt_domain
 
-import "github.com/google/uuid"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 var (
-	ErrEmailAlreadyUsed       = "email already used"
-	ErrWrongEmailOrPassword   = "wrong email or password"
-	ErrTryingtoSaveTheNewUser = "error trying to save the new user"
+	ErrEmailAlreadyUsed       = errors.New("email already used")
+	ErrWrongEmailOrPassword   = errors.New("wrong email or password")
+	ErrTryingtoSaveTheNewUser = errors.New("error trying to save the new user")
+	ErrUserNotFound           = errors.New("error user not found")
 )
 
 type Users interface {
