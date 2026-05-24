@@ -14,6 +14,7 @@ import (
 
 type BookingSrv struct {
 	idGenerator   shared_domain_uuid.UuidGenerator
+	userReader    schedule_domain.UserReader
 	professors    schedule_domain.Professors
 	students      schedule_domain.Students
 	bookings      schedule_domain.Bookings

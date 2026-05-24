@@ -8,14 +8,16 @@ import (
 )
 
 type InMemUsers struct {
-	expectedUser  *user_mngmt_domain.User
-	expectedError bool
+	expectedUser          *user_mngmt_domain.User
+	expectedGetError      bool
+	expectedSaveUserError bool
 }
 
-func NewInMemUsers(expectedUser *user_mngmt_domain.User, expectSignupError bool) *InMemUsers {
+func NewInMemUsers(expectedUser *user_mngmt_domain.User, expectGetError bool, expectedSaveUserError bool) *InMemUsers {
 	return &InMemUsers{
-		expectedUser:  expectedUser,
-		expectedError: expectSignupError,
+		expectedUser:          expectedUser,
+		expectedGetError:      expectGetError,
+		expectedSaveUserError: expectedSaveUserError,
 	}
 }
 
@@ -24,12 +26,15 @@ func (umu *InMemUsers) GetById(userId uuid.UUID) (*user_mngmt_domain.User, error
 }
 
 func (umu *InMemUsers) GetByEmail(userEmail string) (*user_mngmt_domain.User, error) {
-	if umu.expectedError {
+	if umu.expectedGetError {
 		return nil, errors.New(user_mngmt_domain.ErrEmailAlreadyUsed)
 	}
 	return umu.expectedUser, nil
 }
 
 func (umu *InMemUsers) SaveUser(newUser *user_mngmt_domain.User, newEncryptedPass string) error {
+	if umu.expectedSaveUserError {
+		return errors.New(user_mngmt_domain.ErrTryingtoSaveTheNewUser)
+	}
 	return nil
 }

@@ -29,7 +29,7 @@ var (
 func TestAuthService(t *testing.T) {
 	t.Run("should not signup if email is already used", func(t *testing.T) {
 
-		users := user_mngmt_infra.NewInMemUsers(nil, true)
+		users := user_mngmt_infra.NewInMemUsers(nil, true, false)
 		ctx := context.Background()
 
 		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
@@ -38,13 +38,13 @@ func TestAuthService(t *testing.T) {
 
 		_, err := authSrv.Signup(ctx, newUserReq)
 
-		assert.Errorf(t, err, user_mngmt_domain.ErrEmailAlreadyUsed)
+		assert.EqualError(t, err, user_mngmt_domain.ErrEmailAlreadyUsed)
 
 	})
 
-	t.Run("should not signup if email is already used", func(t *testing.T) {
+	t.Run("should return error if new user could not be saved", func(t *testing.T) {
 
-		users := user_mngmt_infra.NewInMemUsers(nil, true)
+		users := user_mngmt_infra.NewInMemUsers(nil, false, true)
 		ctx := context.Background()
 
 		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
@@ -53,12 +53,12 @@ func TestAuthService(t *testing.T) {
 
 		_, err := authSrv.Signup(ctx, newUserReq)
 
-		assert.Errorf(t, err, user_mngmt_domain.ErrEmailAlreadyUsed)
+		assert.EqualError(t, err, user_mngmt_domain.ErrTryingtoSaveTheNewUser)
 
 	})
 	t.Run("should signup a new user", func(t *testing.T) {
 
-		users := user_mngmt_infra.NewInMemUsers(nil, false)
+		users := user_mngmt_infra.NewInMemUsers(nil, false, false)
 		ctx := context.Background()
 
 		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
