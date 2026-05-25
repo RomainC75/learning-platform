@@ -16,5 +16,5 @@ var (
 type Users interface {
 	GetById(userId uuid.UUID) (*User, error)
 	GetByEmail(userEmail string) (*User, error)
-	SaveUser(newUser *User, newEncryptedPass string) error
+	Save(newUser *User) error
 }

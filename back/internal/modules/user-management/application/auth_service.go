@@ -12,6 +12,7 @@ import (
 
 var (
 	ErrWrongEmailOrPassword = errors.New("wrong email or password")
+	bcryptCost              = 10
 )
 
 type SignupRequest struct {
@@ -41,13 +42,15 @@ type LoginResponse struct {
 type AuthService struct {
 	uuidGenerator shared_domain_uuid.UuidGenerator
 	timeGenerator shared_domain_time.TimeGenerator
+	bcrypt        user_mngmt_domain.Bcrypt
 	users         user_mngmt_domain.Users
 }
 
-func NewAuthSrv(uuidGenerator shared_domain_uuid.UuidGenerator, timeGenerator shared_domain_time.TimeGenerator, users user_mngmt_domain.Users) *AuthService {
+func NewAuthSrv(uuidGenerator shared_domain_uuid.UuidGenerator, timeGenerator shared_domain_time.TimeGenerator, bcrypt user_mngmt_domain.Bcrypt, users user_mngmt_domain.Users) *AuthService {
 	return &AuthService{
 		uuidGenerator: uuidGenerator,
 		timeGenerator: timeGenerator,
+		bcrypt:        bcrypt,
 		users:         users,
 	}
 }
@@ -66,10 +69,15 @@ func (as *AuthService) Signup(ctx context.Context, signupRequest SignupRequest) 
 		return SignupResponse{}, user_mngmt_domain.ErrEmailAlreadyUsed
 	}
 
-	newUuid := as.uuidGenerator.Generate()
-	newUser := user_mngmt_domain.NewUser(newUuid, signupRequest.Email, signupRequest.FirstName, signupRequest.FirstName, signupRequest.IsProfessor)
+	encryptedPassword, err := as.bcrypt.GenerateFromPassword([]byte(signupRequest.Password), bcryptCost)
+	if err != nil {
+		return SignupResponse{}, user_mngmt_domain.ErrTryingToGenerateBcryptPassword
+	}
 
-	err = as.users.SaveUser(newUser, signupRequest.Password)
+	newUuid := as.uuidGenerator.Generate()
+	newUser := user_mngmt_domain.NewUser(newUuid, signupRequest.Email, string(encryptedPassword), signupRequest.FirstName, signupRequest.LastName, signupRequest.IsProfessor)
+
+	err = as.users.Save(newUser)
 	if err != nil {
 		return SignupResponse{}, err
 	}
