@@ -8,17 +8,19 @@ import (
 )
 
 type InMemUsers struct {
-	expectedUser          *user_mngmt_domain.User
-	savedPassword         string
-	expectedGetError      bool
-	expectedSaveUserError bool
+	expectedUser  *user_mngmt_domain.User
+	savedPassword string
+	InMemUsersErrors
 }
 
-func NewInMemUsers(expectedUser *user_mngmt_domain.User, expectGetError bool, expectedSaveUserError bool) *InMemUsers {
+type InMemUsersErrors struct {
+	ExpectedGetError      bool
+	ExpectedSaveUserError bool
+}
+
+func NewInMemUsers(inMemUsersErrors InMemUsersErrors) *InMemUsers {
 	return &InMemUsers{
-		expectedUser:          expectedUser,
-		expectedGetError:      expectGetError,
-		expectedSaveUserError: expectedSaveUserError,
+		InMemUsersErrors: inMemUsersErrors,
 	}
 }
 
@@ -27,17 +29,16 @@ func (umu *InMemUsers) GetById(userId uuid.UUID) (*user_mngmt_domain.User, error
 }
 
 func (umu *InMemUsers) GetByEmail(userEmail string) (*user_mngmt_domain.User, error) {
-	if umu.expectedGetError {
+	if umu.ExpectedGetError {
 		return nil, user_mngmt_domain.ErrUserNotFound
 	}
 	return umu.expectedUser, nil
 }
 
 func (umu *InMemUsers) Save(newUser *user_mngmt_domain.User) error {
-	if umu.expectedSaveUserError {
+	if umu.ExpectedSaveUserError {
 		return user_mngmt_domain.ErrTryingtoSaveTheNewUser
 	}
-	fmt.Println("SAVE : ", newUser)
 	umu.expectedUser = newUser
 	return nil
 }
