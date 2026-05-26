@@ -129,7 +129,7 @@ func TestAuthServiceSignup(t *testing.T) {
 				assert.Nil(t, err)
 
 				savedUser := td.GetLastSavedUser()
-				buffUser := user_mngmt_domain.NewUser(newUserUuid, newUserReq.Email, bcryptExpectedEncryptedStr, newUserReq.FirstName, newUserReq.LastName, newUserReq.IsProfessor)
+				buffUser := user_mngmt_domain.NewUser(newUserUuid, newUserReq.Email, bcryptExpectedEncryptedStr, newUserReq.FirstName, newUserReq.LastName, newUserReq.UserRole)
 				assert.Equal(t, buffUser, savedUser)
 
 				expectedRes := user_mngmnt_application.SignupResponse{

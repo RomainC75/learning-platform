@@ -16,13 +16,13 @@ var (
 	userLastName  = "Doe"
 	token         = "FAKE_TOKEN"
 	newUserReq    = user_mngmnt_application.SignupRequest{
-		Email:       userEmail,
-		Password:    userPassword,
-		FirstName:   userFirstName,
-		LastName:    userLastName,
-		IsProfessor: false,
+		Email:     userEmail,
+		Password:  userPassword,
+		FirstName: userFirstName,
+		LastName:  userLastName,
+		UserRole:  user_mngmt_domain.IsStudent,
 	}
-	savedUser = user_mngmt_domain.NewUser(newUserUuid, userEmail, userPassword, userFirstName, userLastName, false)
+	savedUser = user_mngmt_domain.NewUser(newUserUuid, userEmail, userPassword, userFirstName, userLastName, user_mngmt_domain.IsStudent)
 	loginReq  = user_mngmnt_application.LoginRequest{
 		Email:    userEmail,
 		Password: userPassword,

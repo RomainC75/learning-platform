@@ -16,11 +16,11 @@ var (
 )
 
 type SignupRequest struct {
-	Email       string `json:"email" required:"true"`
-	Password    string `json:"password" required:"true"`
-	FirstName   string `json:"first_name" required:"true"`
-	LastName    string `json:"last_name" required:"true"`
-	IsProfessor bool   `json:"is_professor"`
+	Email     string                     `json:"email" required:"true"`
+	Password  string                     `json:"password" required:"true"`
+	FirstName string                     `json:"first_name" required:"true"`
+	LastName  string                     `json:"last_name" required:"true"`
+	UserRole  user_mngmt_domain.UserRole `json:"user_role" validate:"required,numeric,min=0,max=1"`
 }
 
 type SignupResponse struct {
@@ -89,7 +89,7 @@ func (as *AuthService) Signup(ctx context.Context, signupRequest SignupRequest) 
 	}
 
 	newUuid := as.uuidGenerator.Generate()
-	newUser := user_mngmt_domain.NewUser(newUuid, signupRequest.Email, string(encryptedPassword), signupRequest.FirstName, signupRequest.LastName, signupRequest.IsProfessor)
+	newUser := user_mngmt_domain.NewUser(newUuid, signupRequest.Email, string(encryptedPassword), signupRequest.FirstName, signupRequest.LastName, signupRequest.UserRole)
 
 	err = as.users.Save(newUser)
 	if err != nil {
