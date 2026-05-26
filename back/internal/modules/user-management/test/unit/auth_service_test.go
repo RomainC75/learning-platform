@@ -7,29 +7,8 @@ import (
 	user_mngmt_domain "language-learning/internal/modules/user-management/domain"
 	user_mngmt_infra "language-learning/internal/modules/user-management/infra"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-)
-
-var (
-	newUserUuid  = uuid.MustParse("3d30a9c8-5768-4d73-ab5d-8d36cab7f03f")
-	userEmail    = "john_doe@email.com"
-	userPassword = "123456789"
-	newUserReq   = user_mngmnt_application.SignupRequest{
-		Email:       userEmail,
-		Password:    userPassword,
-		FirstName:   "John",
-		LastName:    "Doe",
-		IsProfessor: false,
-	}
-	loginReq = user_mngmnt_application.LoginRequest{
-		Email:    userEmail,
-		Password: userPassword,
-	}
-	now                        = time.Date(2026, time.May, 1, 12, 0, 0, 0, time.UTC)
-	bcryptExpectedEncryptedStr = "encrypted_string"
 )
 
 // func TestAuthServiceLogin(t *testing.T) {
@@ -44,43 +23,7 @@ var (
 // 		_, err := authSrv.Login(ctx, loginReq)
 // 		assert.EqualError(t, err, user_mngmnt_application.ErrWrongEmailOrPassword.Error())
 // 	})
-// 	t.Run("should not Login if password is wrong", func(t *testing.T) {
-// 		users := user_mngmt_infra.NewInMemUsers(nil, false, false)
-// 		ctx := context.Background()
-
-// 		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
-// 		uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
-// 		authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, users)
-
-// 		_, err := authSrv.Login(ctx, loginReq)
-// 		assert.EqualError(t, err, user_mngmnt_application.ErrWrongEmailOrPassword.Error())
-// 	})
 // }
-
-type AuthTestDriver struct {
-	users   *user_mngmt_infra.InMemUsers
-	authSrv *user_mngmnt_application.AuthService
-}
-
-func NewTestDriver(now time.Time, newUserUuid uuid.UUID) *AuthTestDriver {
-	users := user_mngmt_infra.NewInMemUsers(user_mngmt_infra.InMemUsersErrors{})
-
-	timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
-	uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
-
-	deterministicBcrypt := user_mngmt_infra.NewDeterministicBcrypt(bcryptExpectedEncryptedStr, false)
-	authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, deterministicBcrypt, users)
-
-	return &AuthTestDriver{
-		users:   users,
-		authSrv: authSrv,
-	}
-}
-
-func (atd *AuthTestDriver) Signup(signupReq user_mngmnt_application.SignupRequest) (user_mngmnt_application.SignupResponse, error) {
-	ctx := context.Background()
-	return atd.authSrv.Signup(ctx, signupReq)
-}
 
 type AuthTestCase struct {
 	CaseMessage string
@@ -113,6 +56,7 @@ var (
 			IsErrorExpected:  false,
 			ExpectedError:    user_mngmt_domain.ErrEmailAlreadyUsed,
 		},
+		// TODO : bcrypt password generation error
 	}
 )
 

@@ -3,7 +3,7 @@ package user_mngmt_domain
 import "errors"
 
 var (
-	ErrTryingToGenerateBcryptPassword = errors.New("bcrypt : error trying to generate password")
+	ErrTryingToGenerateBcryptPassword = errors.New("bcrypt : error trying to generate password. maximum 72 bytes long")
 	ErrInvalidHashedPass              = errors.New("hashedPasword invalid")
 )
 
