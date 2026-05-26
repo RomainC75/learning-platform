@@ -18,7 +18,7 @@ func NewInMemJWT(expectedToken string, expectedErrorOpt ...bool) *InMemJWT {
 	}
 }
 
-func (imj *InMemJWT) CreateToken(username string) (string, error) {
+func (imj *InMemJWT) CreateToken(string, user_mngmt_domain.UserRole) (string, error) {
 	if imj.expectedError {
 		return "", user_mngmt_domain.ErrCreatingToken
 	}

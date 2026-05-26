@@ -3,6 +3,7 @@ package user_mngmnt_unit
 import (
 	user_mngmnt_application "language-learning/internal/modules/user-management/application"
 	user_mngmt_domain "language-learning/internal/modules/user-management/domain"
+	user_mngmt_dto_res "language-learning/internal/modules/user-management/dtos/responses"
 	user_mngmt_infra "language-learning/internal/modules/user-management/infra"
 	"testing"
 
@@ -68,7 +69,7 @@ func TestAuthServiceLogin(t *testing.T) {
 			} else {
 				assert.Nil(t, err)
 
-				expectedRes := user_mngmnt_application.LoginResponse{
+				expectedRes := user_mngmt_dto_res.LoginResponse{
 					Id:    newUserUuid,
 					Email: userEmail,
 					Token: token,
@@ -132,7 +133,7 @@ func TestAuthServiceSignup(t *testing.T) {
 				buffUser := user_mngmt_domain.NewUser(newUserUuid, newUserReq.Email, bcryptExpectedEncryptedStr, newUserReq.FirstName, newUserReq.LastName, newUserReq.UserRole)
 				assert.Equal(t, buffUser, savedUser)
 
-				expectedRes := user_mngmnt_application.SignupResponse{
+				expectedRes := user_mngmt_dto_res.SignupResponse{
 					Id:    newUserUuid,
 					Email: userEmail,
 				}

@@ -1,8 +1,8 @@
 package user_mngmnt_unit
 
 import (
-	user_mngmnt_application "language-learning/internal/modules/user-management/application"
 	user_mngmt_domain "language-learning/internal/modules/user-management/domain"
+	user_mngmt_dto_req "language-learning/internal/modules/user-management/dtos/requests"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,7 +15,7 @@ var (
 	userFirstName = "John"
 	userLastName  = "Doe"
 	token         = "FAKE_TOKEN"
-	newUserReq    = user_mngmnt_application.SignupRequest{
+	newUserReq    = user_mngmt_dto_req.SignupRequest{
 		Email:     userEmail,
 		Password:  userPassword,
 		FirstName: userFirstName,
@@ -23,7 +23,7 @@ var (
 		UserRole:  user_mngmt_domain.IsStudent,
 	}
 	savedUser = user_mngmt_domain.NewUser(newUserUuid, userEmail, userPassword, userFirstName, userLastName, user_mngmt_domain.IsStudent)
-	loginReq  = user_mngmnt_application.LoginRequest{
+	loginReq  = user_mngmt_dto_req.LoginRequest{
 		Email:    userEmail,
 		Password: userPassword,
 	}

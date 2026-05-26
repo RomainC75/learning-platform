@@ -1,6 +1,8 @@
 package user_mngmt_domain
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -55,6 +57,14 @@ func (u *User) IsStudent() bool {
 	return u.userRole == IsStudent
 }
 
+func (u *User) Role() UserRole {
+	return u.userRole
+}
+
 func (u *User) IsPasswordValid(compFn func(hashedPassword []byte, password []byte) error, clearPass string) error {
+	err := compFn([]byte(u.password), []byte(clearPass))
+	if err != nil {
+		fmt.Println("===> ERRRR", err.Error())
+	}
 	return compFn([]byte(u.password), []byte(clearPass))
 }

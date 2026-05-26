@@ -21,7 +21,7 @@ func ConnectRoutes() http.Handler {
 
 	api := r.PathPrefix("/api").Subrouter()
 
-	// ChatRoutes(api)
+	AuthRoutes(api)
 	HealthRoutes(api)
 
 	return corsHandler(r)

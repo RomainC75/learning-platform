@@ -5,6 +5,7 @@ import "errors"
 var (
 	ErrTryingToGenerateBcryptPassword = errors.New("bcrypt : error trying to generate password. maximum 72 bytes long")
 	ErrInvalidPass                    = errors.New("hashedPasword invalid")
+	BcryptCost                        = 10
 )
 
 type Bcrypt interface {
