@@ -24,6 +24,14 @@ func NewUser(id uuid.UUID, email string, password string, firstName string, last
 	}
 }
 
+func (u *User) Email() string {
+	return u.email
+}
+
+func (u *User) Id() uuid.UUID {
+	return u.id
+}
+
 func (u *User) FirstName() string {
 	return u.firstName
 }

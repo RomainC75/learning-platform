@@ -1,8 +1,6 @@
 package user_mngmnt_unit
 
 import (
-	"context"
-	shared_infra "language-learning/internal/modules/shared/infra"
 	user_mngmnt_application "language-learning/internal/modules/user-management/application"
 	user_mngmt_domain "language-learning/internal/modules/user-management/domain"
 	user_mngmt_infra "language-learning/internal/modules/user-management/infra"
@@ -14,7 +12,7 @@ import (
 type AuthLoginTestCase struct {
 	CaseMessage string
 	user_mngmt_infra.InMemUsersErrors
-	BcryptError     bool
+	IsBcryptError   bool
 	IsErrorExpected bool
 	ExpectedError   error
 	User            *user_mngmt_domain.User
@@ -42,6 +40,16 @@ var (
 			user_mngmnt_application.ErrWrongEmailOrPassword,
 			savedUser,
 		},
+		{
+			"shoulds get the token is E/P are correct",
+			user_mngmt_infra.InMemUsersErrors{
+				ExpectedGetError: false,
+			},
+			false,
+			false,
+			nil,
+			savedUser,
+		},
 	}
 )
 
@@ -49,32 +57,21 @@ func TestAuthServiceLogin(t *testing.T) {
 	for _, tc := range loginTestCases {
 		t.Run(tc.CaseMessage, func(t *testing.T) {
 
-			users := user_mngmt_infra.NewInMemUsers(tc.InMemUsersErrors)
+			td := NewTestDriver(now, newUserUuid, tc.InMemUsersErrors, tc.IsBcryptError)
 			if tc.User != nil {
-				users.Save(tc.User)
+				td.SaveUser(tc.User)
 			}
-			ctx := context.Background()
-
-			timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
-			uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
-
-			deterministicBcrypt := user_mngmt_infra.NewDeterministicBcrypt(bcryptExpectedEncryptedStr, tc.BcryptError)
-			authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, deterministicBcrypt, users)
-
-			res, err := authSrv.Login(ctx, loginReq)
+			res, err := td.Login(loginReq)
 
 			if tc.IsErrorExpected {
 				assert.EqualError(t, err, tc.ExpectedError.Error())
 			} else {
 				assert.Nil(t, err)
 
-				savedUser := users.GetLastSavedUser()
-				buffUser := user_mngmt_domain.NewUser(uuidGenerator.Generate(), loginReq.Email, bcryptExpectedEncryptedStr, newUserReq.FirstName, newUserReq.LastName, newUserReq.IsProfessor)
-				assert.Equal(t, buffUser, savedUser)
-
-				expectedRes := user_mngmnt_application.SignupResponse{
+				expectedRes := user_mngmnt_application.LoginResponse{
 					Id:    newUserUuid,
 					Email: userEmail,
+					Token: token,
 				}
 				assert.Equal(t, expectedRes, res)
 			}
@@ -86,7 +83,7 @@ func TestAuthServiceLogin(t *testing.T) {
 type AuthTestCase struct {
 	CaseMessage string
 	user_mngmt_infra.InMemUsersErrors
-	BcryptError     bool
+	IsBcryptError   bool
 	IsErrorExpected bool
 	ExpectedError   error
 }
@@ -96,21 +93,21 @@ var (
 		{
 			CaseMessage:      "should not signup if email is already used",
 			InMemUsersErrors: user_mngmt_infra.InMemUsersErrors{false, false},
-			BcryptError:      false,
+			IsBcryptError:    false,
 			IsErrorExpected:  true,
 			ExpectedError:    user_mngmt_domain.ErrEmailAlreadyUsed,
 		},
 		{
 			CaseMessage:      "should return error if new user could not be saved",
 			InMemUsersErrors: user_mngmt_infra.InMemUsersErrors{true, true},
-			BcryptError:      false,
+			IsBcryptError:    false,
 			IsErrorExpected:  true,
 			ExpectedError:    user_mngmt_domain.ErrTryingtoSaveTheNewUser,
 		},
 		{
 			CaseMessage:      "should signup a new user and the encrypted password saved",
 			InMemUsersErrors: user_mngmt_infra.InMemUsersErrors{true, false},
-			BcryptError:      false,
+			IsBcryptError:    false,
 			IsErrorExpected:  false,
 			ExpectedError:    user_mngmt_domain.ErrEmailAlreadyUsed,
 		},
@@ -122,24 +119,17 @@ func TestAuthServiceSignup(t *testing.T) {
 	for _, tc := range authTestCase {
 		t.Run(tc.CaseMessage, func(t *testing.T) {
 
-			users := user_mngmt_infra.NewInMemUsers(tc.InMemUsersErrors)
-			ctx := context.Background()
+			td := NewTestDriver(now, newUserUuid, tc.InMemUsersErrors, tc.IsBcryptError)
 
-			timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
-			uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
-
-			deterministicBcrypt := user_mngmt_infra.NewDeterministicBcrypt(bcryptExpectedEncryptedStr, tc.BcryptError)
-			authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, deterministicBcrypt, users)
-
-			res, err := authSrv.Signup(ctx, newUserReq)
+			res, err := td.Signup(newUserReq)
 
 			if tc.IsErrorExpected {
 				assert.EqualError(t, err, tc.ExpectedError.Error())
 			} else {
 				assert.Nil(t, err)
 
-				savedUser := users.GetLastSavedUser()
-				buffUser := user_mngmt_domain.NewUser(uuidGenerator.Generate(), newUserReq.Email, bcryptExpectedEncryptedStr, newUserReq.FirstName, newUserReq.LastName, newUserReq.IsProfessor)
+				savedUser := td.GetLastSavedUser()
+				buffUser := user_mngmt_domain.NewUser(newUserUuid, newUserReq.Email, bcryptExpectedEncryptedStr, newUserReq.FirstName, newUserReq.LastName, newUserReq.IsProfessor)
 				assert.Equal(t, buffUser, savedUser)
 
 				expectedRes := user_mngmnt_application.SignupResponse{
@@ -148,8 +138,6 @@ func TestAuthServiceSignup(t *testing.T) {
 				}
 				assert.Equal(t, expectedRes, res)
 			}
-
 		})
 	}
-
 }

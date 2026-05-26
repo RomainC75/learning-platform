@@ -14,6 +14,7 @@ var (
 	userPassword  = "123456789"
 	userFirstName = "John"
 	userLastName  = "Doe"
+	token         = "FAKE_TOKEN"
 	newUserReq    = user_mngmnt_application.SignupRequest{
 		Email:       userEmail,
 		Password:    userPassword,

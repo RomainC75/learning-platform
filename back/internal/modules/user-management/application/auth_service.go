@@ -43,14 +43,16 @@ type AuthService struct {
 	uuidGenerator shared_domain_uuid.UuidGenerator
 	timeGenerator shared_domain_time.TimeGenerator
 	bcrypt        user_mngmt_domain.Bcrypt
+	jwt           user_mngmt_domain.Jwt
 	users         user_mngmt_domain.Users
 }
 
-func NewAuthSrv(uuidGenerator shared_domain_uuid.UuidGenerator, timeGenerator shared_domain_time.TimeGenerator, bcrypt user_mngmt_domain.Bcrypt, users user_mngmt_domain.Users) *AuthService {
+func NewAuthSrv(uuidGenerator shared_domain_uuid.UuidGenerator, timeGenerator shared_domain_time.TimeGenerator, bcrypt user_mngmt_domain.Bcrypt, jwt user_mngmt_domain.Jwt, users user_mngmt_domain.Users) *AuthService {
 	return &AuthService{
 		uuidGenerator: uuidGenerator,
 		timeGenerator: timeGenerator,
 		bcrypt:        bcrypt,
+		jwt:           jwt,
 		users:         users,
 	}
 }
@@ -64,7 +66,15 @@ func (as *AuthService) Login(ctx context.Context, loginRequest LoginRequest) (Lo
 	if err != nil {
 		return LoginResponse{}, ErrWrongEmailOrPassword
 	}
-	return LoginResponse{}, nil
+	token, err := as.jwt.CreateToken(foundUser.Email())
+	if err != nil {
+		return LoginResponse{}, err
+	}
+	return LoginResponse{
+		Id:    foundUser.Id(),
+		Email: foundUser.Email(),
+		Token: token,
+	}, nil
 }
 
 func (as *AuthService) Signup(ctx context.Context, signupRequest SignupRequest) (SignupResponse, error) {
