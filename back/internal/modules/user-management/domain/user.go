@@ -1,6 +1,8 @@
 package user_mngmt_domain
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type User struct {
 	id          uuid.UUID
@@ -34,6 +36,6 @@ func (u *User) IsProfessor() bool {
 	return u.isProfessor
 }
 
-// func (u *User) IsPasswordValid(compareFn ) bool {
-
-// }
+func (u *User) IsPasswordValid(compFn func(hashedPassword []byte, password []byte) error, clearPass string) error {
+	return compFn([]byte(u.password), []byte(clearPass))
+}

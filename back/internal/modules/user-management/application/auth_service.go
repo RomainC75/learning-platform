@@ -56,8 +56,12 @@ func NewAuthSrv(uuidGenerator shared_domain_uuid.UuidGenerator, timeGenerator sh
 }
 
 func (as *AuthService) Login(ctx context.Context, loginRequest LoginRequest) (LoginResponse, error) {
-	_, err := as.users.GetByEmail(loginRequest.Email)
+	foundUser, err := as.users.GetByEmail(loginRequest.Email)
 	if err != nil && errors.Is(err, user_mngmt_domain.ErrUserNotFound) {
+		return LoginResponse{}, ErrWrongEmailOrPassword
+	}
+	err = foundUser.IsPasswordValid(as.bcrypt.CompareHashAndPassword, loginRequest.Password)
+	if err != nil {
 		return LoginResponse{}, ErrWrongEmailOrPassword
 	}
 	return LoginResponse{}, nil

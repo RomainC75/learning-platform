@@ -34,3 +34,8 @@ func (atd *AuthTestDriver) Signup(signupReq user_mngmnt_application.SignupReques
 	ctx := context.Background()
 	return atd.authSrv.Signup(ctx, signupReq)
 }
+
+func (atd *AuthTestDriver) Login(loginReq user_mngmnt_application.LoginRequest) (user_mngmnt_application.LoginResponse, error) {
+	ctx := context.Background()
+	return atd.authSrv.Login(ctx, loginReq)
+}

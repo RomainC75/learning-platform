@@ -19,7 +19,7 @@ func NewDeterministicBcrypt(encryptedStr string, expectedError bool) *Determinis
 
 func (db *DeterministicBcrypt) CompareHashAndPassword(hashedPassword, password []byte) error {
 	if db.expectedError {
-		return user_mngmt_domain.ErrTryingToGenerateBcryptPassword
+		return user_mngmt_domain.ErrInvalidPass
 	}
 	return nil
 }

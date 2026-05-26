@@ -11,19 +11,77 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestAuthServiceLogin(t *testing.T) {
-// 	t.Run("should not Login if email is wrong", func(t *testing.T) {
-// 		users := user_mngmt_infra.NewInMemUsers(nil, true, false)
-// 		ctx := context.Background()
+type AuthLoginTestCase struct {
+	CaseMessage string
+	user_mngmt_infra.InMemUsersErrors
+	BcryptError     bool
+	IsErrorExpected bool
+	ExpectedError   error
+	User            *user_mngmt_domain.User
+}
 
-// 		timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
-// 		uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
-// 		authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, users)
+var (
+	loginTestCases = []AuthLoginTestCase{
+		{
+			"should not login if email is not found",
+			user_mngmt_infra.InMemUsersErrors{
+				ExpectedGetError: true,
+			},
+			false,
+			true,
+			user_mngmnt_application.ErrWrongEmailOrPassword,
+			nil,
+		},
+		{
+			"should not login if password is wrong found",
+			user_mngmt_infra.InMemUsersErrors{
+				ExpectedGetError: false,
+			},
+			true,
+			true,
+			user_mngmnt_application.ErrWrongEmailOrPassword,
+			savedUser,
+		},
+	}
+)
 
-// 		_, err := authSrv.Login(ctx, loginReq)
-// 		assert.EqualError(t, err, user_mngmnt_application.ErrWrongEmailOrPassword.Error())
-// 	})
-// }
+func TestAuthServiceLogin(t *testing.T) {
+	for _, tc := range loginTestCases {
+		t.Run(tc.CaseMessage, func(t *testing.T) {
+
+			users := user_mngmt_infra.NewInMemUsers(tc.InMemUsersErrors)
+			if tc.User != nil {
+				users.Save(tc.User)
+			}
+			ctx := context.Background()
+
+			timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
+			uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
+
+			deterministicBcrypt := user_mngmt_infra.NewDeterministicBcrypt(bcryptExpectedEncryptedStr, tc.BcryptError)
+			authSrv := user_mngmnt_application.NewAuthSrv(uuidGenerator, timeGenerator, deterministicBcrypt, users)
+
+			res, err := authSrv.Login(ctx, loginReq)
+
+			if tc.IsErrorExpected {
+				assert.EqualError(t, err, tc.ExpectedError.Error())
+			} else {
+				assert.Nil(t, err)
+
+				savedUser := users.GetLastSavedUser()
+				buffUser := user_mngmt_domain.NewUser(uuidGenerator.Generate(), loginReq.Email, bcryptExpectedEncryptedStr, newUserReq.FirstName, newUserReq.LastName, newUserReq.IsProfessor)
+				assert.Equal(t, buffUser, savedUser)
+
+				expectedRes := user_mngmnt_application.SignupResponse{
+					Id:    newUserUuid,
+					Email: userEmail,
+				}
+				assert.Equal(t, expectedRes, res)
+			}
+
+		})
+	}
+}
 
 type AuthTestCase struct {
 	CaseMessage string
