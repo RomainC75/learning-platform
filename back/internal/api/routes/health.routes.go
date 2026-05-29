@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"language-learning/internal/api/limiter"
 	"language-learning/internal/api/middlewares"
 	"net/http"
 
@@ -9,8 +10,8 @@ import (
 
 func HealthRoutes(mux *mux.Router) {
 
-	mux.Handle("/health/test", middlewares.CORSMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/health/test", limiter.RateLimiterMiddleware(middlewares.CORSMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("is healthy"))
-	})))
+	}))))
 
 }
