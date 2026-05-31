@@ -1,7 +1,7 @@
 package limiter
 
 import (
-	"fmt"
+	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 	"sync"
 	"time"
 )
@@ -13,23 +13,23 @@ var (
 )
 
 type RateHandler struct {
-	started bool
-	tokens  int
+	tokens        int
+	timeGenerator shared_domain_time.TimeGenerator
 	sync.Mutex
 }
 
-func NewRateHandler() *RateHandler {
-	return &RateHandler{}
+func NewRateHandler(tg shared_domain_time.TimeGenerator) *RateHandler {
+	return &RateHandler{
+		timeGenerator: tg,
+	}
 }
 
-func (rh *RateHandler) Start() chan int {
+func (rh *RateHandler) Start(tick <-chan time.Time) chan int {
 	stopChn := make(chan int)
 	go func() {
-		rh.started = true
-		for {
+		for range tick {
 			select {
 			case <-stopChn:
-				rh.started = false
 				return
 			default:
 				rh.Mutex.Lock()
@@ -38,15 +38,13 @@ func (rh *RateHandler) Start() chan int {
 				}
 				rh.Mutex.Unlock()
 			}
-			time.Sleep(refreshTime)
 		}
 	}()
 	return stopChn
 }
 
 func (rh *RateHandler) UseToken() bool {
-	fmt.Println(rh.started, rh.tokens)
-	if rh.started && rh.tokens > 0 {
+	if rh.tokens > 0 {
 		rh.Mutex.Lock()
 		rh.tokens--
 		rh.Mutex.Unlock()

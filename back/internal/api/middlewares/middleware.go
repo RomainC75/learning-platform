@@ -1,12 +1,13 @@
-package limiter
+package middlewares
 
 import (
+	"language-learning/internal/api/limiter"
 	"net/http"
 )
 
 func RateLimiterMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rl := GetRateHandler()
+		rl := limiter.GetRateHandler()
 		if rl == nil {
 			panic("could not get limiter")
 		}
