@@ -3,7 +3,7 @@ package schedule_unit
 import (
 	"context"
 	dtos_requests "language-learning/internal/api/dtos/request"
-	auth_jwt "language-learning/internal/auth/jwt"
+	"language-learning/internal/api/middlewares"
 	schedule_application "language-learning/internal/modules/schedule/application"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
 	schedule_infra "language-learning/internal/modules/schedule/infra"
@@ -50,7 +50,7 @@ func (td *BookingTestDriver) NewScheduleService() *schedule_application.BookingS
 
 func (td *BookingTestDriver) BuildStudentContext() context.Context {
 	ctx := context.Background()
-	return context.WithValue(ctx, auth_jwt.UserId, studentUuid)
+	return context.WithValue(ctx, middlewares.UserIdKey, studentUuid)
 }
 
 func (td *BookingTestDriver) SavedBookings() []schedule_domain.Booking {

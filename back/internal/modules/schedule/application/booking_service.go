@@ -3,7 +3,7 @@ package schedule_application
 import (
 	"context"
 	dtos_requests "language-learning/internal/api/dtos/request"
-	auth_jwt "language-learning/internal/auth/jwt"
+	"language-learning/internal/api/middlewares"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
 	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 	shared_domain_uuid "language-learning/internal/modules/shared/domain/uuid"
@@ -45,7 +45,7 @@ func (bookingSrv *BookingSrv) CreateBooking(ctx context.Context, createBookingRe
 		return CreateBookingResponse{}, err
 	}
 
-	studentuuid, _ := ctx.Value(auth_jwt.UserId).(uuid.UUID)
+	studentuuid, _ := ctx.Value(middlewares.UserIdKey).(uuid.UUID)
 	studentId, err := bookingSrv.students.Get(studentuuid)
 	if err != nil {
 		return CreateBookingResponse{}, err

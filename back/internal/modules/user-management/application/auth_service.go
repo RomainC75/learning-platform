@@ -41,7 +41,7 @@ func (as *AuthService) Login(ctx context.Context, loginRequest user_mngmt_dto_re
 	if err != nil {
 		return user_mngmt_dto_res.LoginResponse{}, ErrWrongEmailOrPassword
 	}
-	token, err := as.jwt.CreateToken(foundUser.Email(), foundUser.Role())
+	token, err := as.jwt.CreateToken(foundUser.Id(), foundUser.Email(), foundUser.Role())
 	if err != nil {
 		return user_mngmt_dto_res.LoginResponse{}, err
 	}

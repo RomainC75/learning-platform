@@ -4,7 +4,7 @@ import (
 	"context"
 	dtos_requests "language-learning/internal/api/dtos/request"
 	dtos_responses "language-learning/internal/api/dtos/responses"
-	auth_jwt "language-learning/internal/auth/jwt"
+	"language-learning/internal/api/middlewares"
 	schedule_application "language-learning/internal/modules/schedule/application"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
 	schedule_infra "language-learning/internal/modules/schedule/infra"
@@ -42,7 +42,7 @@ func NewScheduleTestDriver() *ScheduleTestDriver {
 	))
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, auth_jwt.UserId, professorUuid)
+	ctx = context.WithValue(ctx, middlewares.UserIdKey, professorUuid)
 	return &ScheduleTestDriver{
 		professor: professor,
 		ctx:       ctx,

@@ -4,7 +4,7 @@ import (
 	"context"
 	dtos "language-learning/internal/api/dtos/request"
 	dtos_responses "language-learning/internal/api/dtos/responses"
-	auth_jwt "language-learning/internal/auth/jwt"
+	"language-learning/internal/api/middlewares"
 	schedule_domain "language-learning/internal/modules/schedule/domain"
 	shared_domain_time "language-learning/internal/modules/shared/domain/time"
 
@@ -22,7 +22,7 @@ func NewScheduleSrv(professors schedule_domain.Professors) *ScheduleSrv {
 }
 
 func (ScheduleSrv *ScheduleSrv) CreateSchedule(ctx context.Context, createBookingRequest dtos.CreateScheduleRequest) (dtos_responses.CreateScheduleResponse, error) {
-	professorId := ctx.Value(auth_jwt.UserId).(uuid.UUID)
+	professorId := ctx.Value(middlewares.UserIdKey).(uuid.UUID)
 	foundProfessor, err := ScheduleSrv.professors.Get(professorId)
 	if err != nil {
 		return dtos_responses.CreateScheduleResponse{}, err
