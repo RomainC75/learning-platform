@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	api_utils "language-learning/internal/api/utils"
 	validatorHandler "language-learning/internal/api/validator"
 	shared_infra "language-learning/internal/modules/shared/infra"
 	user_mngmnt_application "language-learning/internal/modules/user-management/application"
@@ -25,7 +26,7 @@ func NewAuthController() *AuthCtrl {
 			shared_infra.NewTimeGenerator(),
 			user_mngmt_infra.NewBcrypt(),
 			user_mngmt_infra.NewJWT(),
-			user_mngmt_infra.NewInMemUsers(user_mngmt_infra.InMemUsersErrors{}),
+			user_mngmt_infra.NewInMemUsers(),
 		),
 		validator: validatorHandler.GetValidator(),
 	}
@@ -50,9 +51,9 @@ func (ac *AuthCtrl) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
-	json.NewEncoder(w).Encode(logRes)
+	api_utils.JsonResponse(w, logRes)
 }
 
 func (ac *AuthCtrl) HandleSignup(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +75,8 @@ func (ac *AuthCtrl) HandleSignup(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	json.NewEncoder(w).Encode(logRes)
+	api_utils.JsonResponse(w, logRes)
 }
