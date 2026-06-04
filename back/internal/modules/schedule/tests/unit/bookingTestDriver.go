@@ -14,14 +14,14 @@ type BookingTestDriver struct {
 	uuidGenerator *shared_infra.InMemUuidGenerator
 	professor     *schedule_domain.Professor
 	student       schedule_domain.StudentId
-	bookings      *schedule_infra.InMemBookingRepo
+	bookings      *schedule_infra.FakeBookingRepo
 	bookingSrv    *schedule_application.BookingSrv
 }
 
 func NewBookingTestDriver() *BookingTestDriver {
 	uuidGenerator := shared_infra.NewInMemUuidGenerator(newBookingUuid)
 
-	bookings := schedule_infra.NewInMemBookingRepo()
+	bookings := schedule_infra.NewFakeBookingRepo()
 
 	return &BookingTestDriver{
 		uuidGenerator: uuidGenerator,
@@ -41,8 +41,8 @@ func (td *BookingTestDriver) CreateBookingsForProfessor(rezas []schedule_domain.
 }
 
 func (td *BookingTestDriver) NewScheduleService() *schedule_application.BookingSrv {
-	professors := schedule_infra.NewInMemProfRepo(td.professor, false)
-	students := schedule_infra.NewInMemStudentRepo(td.student, false)
+	professors := schedule_infra.NewFakeProfRepo(td.professor, false)
+	students := schedule_infra.NewFakeStudentRepo(td.student, false)
 	timeGenerator := shared_infra.NewDeterministicTimeGenerator(nowMarch1)
 	td.bookingSrv = schedule_application.NewBookingSrv(td.uuidGenerator, timeGenerator, professors, students, td.bookings)
 	return td.bookingSrv

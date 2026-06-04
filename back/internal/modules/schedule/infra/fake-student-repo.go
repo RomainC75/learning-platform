@@ -7,19 +7,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type InMemStudentRepo struct {
+type FakeStudentRepo struct {
 	expectedStudent schedule_domain.StudentId
 	isErrorExpected bool
 }
 
-func NewInMemStudentRepo(expectedStudent schedule_domain.StudentId, isErrorExpected bool) *InMemStudentRepo {
-	return &InMemStudentRepo{
+func NewFakeStudentRepo(expectedStudent schedule_domain.StudentId, isErrorExpected bool) *FakeStudentRepo {
+	return &FakeStudentRepo{
 		expectedStudent: expectedStudent,
 		isErrorExpected: isErrorExpected,
 	}
 }
 
-func (studentRepo *InMemStudentRepo) Get(id uuid.UUID) (schedule_domain.StudentId, error) {
+func (studentRepo *FakeStudentRepo) Get(id uuid.UUID) (schedule_domain.StudentId, error) {
 	if studentRepo.isErrorExpected {
 		return schedule_domain.StudentId{}, errors.New(schedule_domain.ErrstudentNotFound)
 	}

@@ -7,36 +7,36 @@ import (
 	"github.com/google/uuid"
 )
 
-type InMemProfRepo struct {
+type FakeProfRepo struct {
 	expectedProfessor *schedule_domain.Professor
 	addedBooking      []schedule_domain.Booking
 	savedSchedule     schedule_domain.Schedule
 	isErrorExpected   bool
 }
 
-func NewInMemProfRepo(expectedProfessor *schedule_domain.Professor, isErrorExpected bool) *InMemProfRepo {
-	return &InMemProfRepo{
+func NewFakeProfRepo(expectedProfessor *schedule_domain.Professor, isErrorExpected bool) *FakeProfRepo {
+	return &FakeProfRepo{
 		expectedProfessor: expectedProfessor,
 		isErrorExpected:   isErrorExpected,
 	}
 }
 
-func (profRepo *InMemProfRepo) Get(id uuid.UUID) (*schedule_domain.Professor, error) {
+func (profRepo *FakeProfRepo) Get(id uuid.UUID) (*schedule_domain.Professor, error) {
 	if profRepo.isErrorExpected {
 		return nil, errors.New(schedule_domain.ErrProfessorNotFound)
 	}
 	return profRepo.expectedProfessor, nil
 }
 
-func (profRepo *InMemProfRepo) AddBooking(professor *schedule_domain.Professor, booking schedule_domain.Booking) error {
+func (profRepo *FakeProfRepo) AddBooking(professor *schedule_domain.Professor, booking schedule_domain.Booking) error {
 	return nil
 }
 
-func (profRepo *InMemProfRepo) ReplaceSchedule(professor *schedule_domain.Professor, schedule schedule_domain.Schedule) error {
+func (profRepo *FakeProfRepo) ReplaceSchedule(professor *schedule_domain.Professor, schedule schedule_domain.Schedule) error {
 	profRepo.savedSchedule = schedule
 	return nil
 }
 
-func (profRepo *InMemProfRepo) GetSavedSchedule() schedule_domain.Schedule {
+func (profRepo *FakeProfRepo) GetSavedSchedule() schedule_domain.Schedule {
 	return profRepo.savedSchedule
 }

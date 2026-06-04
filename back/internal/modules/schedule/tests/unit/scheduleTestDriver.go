@@ -16,7 +16,7 @@ import (
 type ScheduleTestDriver struct {
 	professor   *schedule_domain.Professor
 	scheduleSrv *schedule_application.ScheduleSrv
-	professors  *schedule_infra.InMemProfRepo
+	professors  *schedule_infra.FakeProfRepo
 	ctx         context.Context
 }
 
@@ -51,7 +51,7 @@ func NewScheduleTestDriver() *ScheduleTestDriver {
 }
 
 func (td *ScheduleTestDriver) NewScheduleService(isProfessorMissing bool) {
-	professors := schedule_infra.NewInMemProfRepo(td.professor, isProfessorMissing)
+	professors := schedule_infra.NewFakeProfRepo(td.professor, isProfessorMissing)
 	td.professors = professors
 	td.scheduleSrv = schedule_application.NewScheduleSrv(professors)
 }
