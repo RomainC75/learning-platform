@@ -12,7 +12,7 @@ import (
 
 type AuthLoginTestCase struct {
 	CaseMessage string
-	user_mngmt_infra.InMemUsersErrors
+	user_mngmt_infra.FakeUsersErrors
 	IsBcryptError   bool
 	IsErrorExpected bool
 	ExpectedError   error
@@ -23,7 +23,7 @@ var (
 	loginTestCases = []AuthLoginTestCase{
 		{
 			"should not login if email is not found",
-			user_mngmt_infra.InMemUsersErrors{
+			user_mngmt_infra.FakeUsersErrors{
 				ExpectedGetError: true,
 			},
 			false,
@@ -33,7 +33,7 @@ var (
 		},
 		{
 			"should not login if password is wrong found",
-			user_mngmt_infra.InMemUsersErrors{
+			user_mngmt_infra.FakeUsersErrors{
 				ExpectedGetError: false,
 			},
 			true,
@@ -43,7 +43,7 @@ var (
 		},
 		{
 			"shoulds get the token is E/P are correct",
-			user_mngmt_infra.InMemUsersErrors{
+			user_mngmt_infra.FakeUsersErrors{
 				ExpectedGetError: false,
 			},
 			false,
@@ -58,7 +58,7 @@ func TestAuthServiceLogin(t *testing.T) {
 	for _, tc := range loginTestCases {
 		t.Run(tc.CaseMessage, func(t *testing.T) {
 
-			td := NewTestDriver(now, newUserUuid, tc.InMemUsersErrors, tc.IsBcryptError)
+			td := NewTestDriver(now, newUserUuid, tc.FakeUsersErrors, tc.IsBcryptError)
 			if tc.User != nil {
 				td.SaveUser(tc.User)
 			}
@@ -83,7 +83,7 @@ func TestAuthServiceLogin(t *testing.T) {
 
 type AuthTestCase struct {
 	CaseMessage string
-	user_mngmt_infra.InMemUsersErrors
+	user_mngmt_infra.FakeUsersErrors
 	IsBcryptError   bool
 	IsErrorExpected bool
 	ExpectedError   error
@@ -92,25 +92,25 @@ type AuthTestCase struct {
 var (
 	authTestCase = []AuthTestCase{
 		{
-			CaseMessage:      "should not signup if email is already used",
-			InMemUsersErrors: user_mngmt_infra.InMemUsersErrors{false, false},
-			IsBcryptError:    false,
-			IsErrorExpected:  true,
-			ExpectedError:    user_mngmt_domain.ErrEmailAlreadyUsed,
+			CaseMessage:     "should not signup if email is already used",
+			FakeUsersErrors: user_mngmt_infra.FakeUsersErrors{false, false},
+			IsBcryptError:   false,
+			IsErrorExpected: true,
+			ExpectedError:   user_mngmt_domain.ErrEmailAlreadyUsed,
 		},
 		{
-			CaseMessage:      "should return error if new user could not be saved",
-			InMemUsersErrors: user_mngmt_infra.InMemUsersErrors{true, true},
-			IsBcryptError:    false,
-			IsErrorExpected:  true,
-			ExpectedError:    user_mngmt_domain.ErrTryingtoSaveTheNewUser,
+			CaseMessage:     "should return error if new user could not be saved",
+			FakeUsersErrors: user_mngmt_infra.FakeUsersErrors{true, true},
+			IsBcryptError:   false,
+			IsErrorExpected: true,
+			ExpectedError:   user_mngmt_domain.ErrTryingtoSaveTheNewUser,
 		},
 		{
-			CaseMessage:      "should signup a new user and the encrypted password saved",
-			InMemUsersErrors: user_mngmt_infra.InMemUsersErrors{true, false},
-			IsBcryptError:    false,
-			IsErrorExpected:  false,
-			ExpectedError:    user_mngmt_domain.ErrEmailAlreadyUsed,
+			CaseMessage:     "should signup a new user and the encrypted password saved",
+			FakeUsersErrors: user_mngmt_infra.FakeUsersErrors{true, false},
+			IsBcryptError:   false,
+			IsErrorExpected: false,
+			ExpectedError:   user_mngmt_domain.ErrEmailAlreadyUsed,
 		},
 		// TODO : bcrypt password generation error
 	}
@@ -120,7 +120,7 @@ func TestAuthServiceSignup(t *testing.T) {
 	for _, tc := range authTestCase {
 		t.Run(tc.CaseMessage, func(t *testing.T) {
 
-			td := NewTestDriver(now, newUserUuid, tc.InMemUsersErrors, tc.IsBcryptError)
+			td := NewTestDriver(now, newUserUuid, tc.FakeUsersErrors, tc.IsBcryptError)
 
 			res, err := td.Signup(newUserReq)
 

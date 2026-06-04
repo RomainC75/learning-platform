@@ -14,12 +14,12 @@ import (
 )
 
 type AuthTestDriver struct {
-	users   *user_mngmt_infra.InMemUsers
+	users   *user_mngmt_infra.FakeUsers
 	authSrv *user_mngmnt_application.AuthService
 }
 
-func NewTestDriver(now time.Time, newUserUuid uuid.UUID, imUserE user_mngmt_infra.InMemUsersErrors, isBcryptError bool) *AuthTestDriver {
-	users := user_mngmt_infra.NewInMemUsers(imUserE)
+func NewTestDriver(now time.Time, newUserUuid uuid.UUID, imUserE user_mngmt_infra.FakeUsersErrors, isBcryptError bool) *AuthTestDriver {
+	users := user_mngmt_infra.NewFakeUsers(imUserE)
 
 	timeGenerator := shared_infra.NewDeterministicTimeGenerator(now)
 	uuidGenerator := shared_infra.NewInMemUuidGenerator(newUserUuid)
