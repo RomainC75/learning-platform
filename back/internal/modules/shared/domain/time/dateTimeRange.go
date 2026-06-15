@@ -21,13 +21,6 @@ func NewDateTimeRange(start time.Time, duration time.Duration) DateTimeRange {
 	}
 }
 
-func (dtr DateTimeRange) ToSnapshot() DateTimeRangeSnapshot {
-	return DateTimeRangeSnapshot{
-		Start:    dtr.start,
-		Duration: dtr.duration,
-	}
-}
-
 func (dtr DateTimeRange) EndDate() time.Time {
 	return dtr.start.Add(dtr.duration)
 }
@@ -72,4 +65,17 @@ func (tdr DateTimeRange) endsBeforeOrEqual(otherTime time.Time) bool {
 func (tdr DateTimeRange) endsAfterOrEqual(otherTime time.Time) bool {
 	tdrEnd := tdr.start.Add(tdr.duration)
 	return tdrEnd.Compare(otherTime) > 0
+}
+
+// == Snapshot ==
+
+func (dtr DateTimeRange) ToSnapshot() DateTimeRangeSnapshot {
+	return DateTimeRangeSnapshot{
+		Start:    dtr.start,
+		Duration: dtr.duration,
+	}
+}
+
+func NewDateTimeRangeFromSnapshot(snap DateTimeRangeSnapshot) DateTimeRange {
+	return NewDateTimeRange(snap.Start, snap.Duration)
 }

@@ -9,8 +9,6 @@ import (
 
 type FakeProfRepo struct {
 	expectedProfessor *schedule_domain.Professor
-	addedBooking      []schedule_domain.Booking
-	savedSchedule     schedule_domain.Schedule
 	isErrorExpected   bool
 }
 
@@ -28,15 +26,11 @@ func (profRepo *FakeProfRepo) Get(id uuid.UUID) (*schedule_domain.Professor, err
 	return profRepo.expectedProfessor, nil
 }
 
-func (profRepo *FakeProfRepo) AddBooking(professor *schedule_domain.Professor, booking schedule_domain.Booking) error {
-	return nil
-}
-
-func (profRepo *FakeProfRepo) ReplaceSchedule(professor *schedule_domain.Professor, schedule schedule_domain.Schedule) error {
-	profRepo.savedSchedule = schedule
-	return nil
-}
-
 func (profRepo *FakeProfRepo) GetSavedSchedule() schedule_domain.Schedule {
-	return profRepo.savedSchedule
+	return schedule_domain.NewScheduleFromSnapshot(profRepo.expectedProfessor.ToSnapshot().Schedule)
+}
+
+func (profRepo *FakeProfRepo) Save(professor *schedule_domain.Professor) error {
+	profRepo.expectedProfessor = professor
+	return nil
 }

@@ -33,3 +33,7 @@ func (tr TimeRange) IsContaining(other DateTimeRange) bool {
 	trEndMinAfter00h := trStartMinAfter00h + int(tr.duration.Minutes())
 	return trStartMinAfter00h <= other.StartInMinutesAfter00h() && trStartMinAfter00h <= other.EndInMinutesAfter00h() && trEndMinAfter00h >= other.StartInMinutesAfter00h() && trEndMinAfter00h >= other.EndInMinutesAfter00h()
 }
+
+func NewTimeRangeFromSnapshot(snap TimeRangeSnapshot) TimeRange {
+	return NewTimeRange(NewLocalTimeFromSnapshot(snap.LocalTimeStart), snap.Duration)
+}

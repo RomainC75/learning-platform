@@ -34,3 +34,7 @@ func (wa WeeklyAvailability) ToSnapshot() WeeklyAvailabilitySnapshot {
 		TimeRange: wa.timeRange.ToSnapshot(),
 	}
 }
+
+func NewWeeklyAvailabilityFromSnapshot(snap WeeklyAvailabilitySnapshot) WeeklyAvailability {
+	return NewWeeklyAvailability(snap.Day, shared_domain_time.NewTimeRangeFromSnapshot(snap.TimeRange))
+}

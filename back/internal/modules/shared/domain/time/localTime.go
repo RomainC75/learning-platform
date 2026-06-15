@@ -49,3 +49,7 @@ func (lt LocalTime) ToSnapshot() LocalTimeSnapshot {
 		Minute: lt.minute,
 	}
 }
+
+func NewLocalTimeFromSnapshot(snap LocalTimeSnapshot) LocalTime {
+	return MustLocalTime24(snap.Hour, snap.Minute)
+}

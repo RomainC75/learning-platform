@@ -27,3 +27,7 @@ func (ae AvailabilityException) ToSnapshot() AvailabilityExceptionSnapshot {
 type AvailabilityExceptionSnapshot struct {
 	DateTimeRange shared_domain_time.DateTimeRangeSnapshot
 }
+
+func NewAvailabilityExceptionFromSnapshot(snap AvailabilityExceptionSnapshot) AvailabilityException {
+	return NewAvailabilityException(shared_domain_time.NewDateTimeRangeFromSnapshot(snap.DateTimeRange))
+}

@@ -65,3 +65,19 @@ func (s Schedule) ToSnapshot() ScheduleSnapshot {
 		AvailabilityExceptions: availabilityExceptions,
 	}
 }
+
+func NewScheduleFromSnapshot(snap ScheduleSnapshot) Schedule {
+	weeklyAvailabilities := make([]WeeklyAvailability, 0, len(snap.WeeklyAvailabilities))
+	for _, waSnap := range snap.WeeklyAvailabilities {
+		wa := NewWeeklyAvailabilityFromSnapshot(waSnap)
+		weeklyAvailabilities = append(weeklyAvailabilities, wa)
+	}
+
+	availabilityExceptions := make([]AvailabilityException, 0, len(snap.AvailabilityExceptions))
+	for _, aeSnap := range snap.AvailabilityExceptions {
+		ae := NewAvailabilityExceptionFromSnapshot(aeSnap)
+		availabilityExceptions = append(availabilityExceptions, ae)
+	}
+
+	return NewSchedule(weeklyAvailabilities, availabilityExceptions)
+}

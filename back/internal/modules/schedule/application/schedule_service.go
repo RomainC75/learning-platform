@@ -31,11 +31,6 @@ func (ScheduleSrv *ScheduleSrv) CreateSchedule(ctx context.Context, createBookin
 	newSchedule := NewScheduleFromDto(createBookingRequest)
 	foundProfessor.SetSchedule(newSchedule)
 
-	err = ScheduleSrv.professors.ReplaceSchedule(foundProfessor, newSchedule)
-	if err != nil {
-		return dtos_responses.CreateScheduleResponse{}, err
-	}
-
 	return dtos_responses.ToCreateScheduleResponse(newSchedule), nil
 }
 
