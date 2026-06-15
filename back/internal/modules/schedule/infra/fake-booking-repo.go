@@ -23,7 +23,7 @@ func (imbr *FakeBookingRepo) SetBooking(newBooking schedule_domain.Booking) erro
 	return nil
 }
 
-func (imbr *FakeBookingRepo) GetBookings(professor *schedule_domain.Professor) []schedule_domain.Booking {
+func (imbr *FakeBookingRepo) GetBookingsByProfessorId(professorId schedule_domain.ProfessorId) []schedule_domain.Booking {
 	return imbr.bookings
 }
 

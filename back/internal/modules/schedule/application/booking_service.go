@@ -58,7 +58,7 @@ func (bookingSrv *BookingSrv) CreateBooking(ctx context.Context, createBookingRe
 		return CreateBookingResponse{}, err
 	}
 
-	bookings := bookingSrv.bookings.GetBookings(foundProfessor)
+	bookings := bookingSrv.bookings.GetBookingsByProfessorId(foundProfessor.Id())
 	err = foundProfessor.IsBookable(bookings, newBooking)
 	if err != nil {
 		return CreateBookingResponse{}, err
